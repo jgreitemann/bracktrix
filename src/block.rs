@@ -85,9 +85,26 @@ impl Block {
             Point::new(0, 1),
             Point::new(1, 1),
         ];
-        for point in points {
-            let screen_point = self.rotation.apply_to(&point) + self.origin;
-            ctx.set(screen_point.x, screen_point.y, RED, BLACK, to_cp437('█'));
+
+        for Pixel { position, color } in self.as_pixels() {
+            ctx.set(position.x, position.y, color, BLACK, to_cp437('█'));
         }
+    }
+
+    pub fn as_pixels<'a>(&'a self) -> impl Iterator<Item = Pixel> + 'a {
+        let points = [
+            Point::new(0, -1),
+            Point::new(0, 0),
+            Point::new(0, 1),
+            Point::new(1, 1),
+        ];
+
+        points
+            .into_iter()
+            .map(|p| self.rotation.apply_to(&p) + self.origin)
+            .map(|position| Pixel {
+                position,
+                color: RED,
+            })
     }
 }
