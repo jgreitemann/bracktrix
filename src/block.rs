@@ -62,7 +62,7 @@ impl Block {
         }
     }
 
-    pub fn update(&mut self, ctx: &BTerm) {
+    pub fn update(&mut self, ctx: &BTerm, frame_idx: usize) {
         if let Some(key) = ctx.key {
             self.origin.x += match key {
                 VirtualKeyCode::Left => -1,
@@ -75,6 +75,10 @@ impl Block {
                 VirtualKeyCode::Down => self.rotation.rotate_clockwise(),
                 _ => self.rotation,
             };
+        }
+
+        if frame_idx % 4 == 0 {
+            self.origin.y += 1;
         }
     }
 
