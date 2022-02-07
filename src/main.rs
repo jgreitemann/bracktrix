@@ -26,8 +26,12 @@ impl State {
         Self {
             frame_index: 0,
             canvas: Canvas::new(),
-            active_block: Block::new(Point::new(SCREEN_WIDTH / 2, 0)),
+            active_block: Block::spawn(),
         }
+    }
+
+    fn block_fits_canvas(&self, block: &Block) -> bool {
+        block.points().all(|p| self.canvas.is_empty(&p))
     }
 }
 
@@ -35,12 +39,13 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         ctx.cls();
 
-        if let Some(VirtualKeyCode::Space) = ctx.key {
-            self.canvas.bake(self.active_block.as_pixels());
-            self.active_block = Block::new(Point::new(SCREEN_WIDTH / 2, 0));
+        let updated = self.active_block.updated(ctx, self.frame_index);
+        if self.block_fits_canvas(&updated) {
+            self.active_block = updated;
+        } else {
+            self.canvas.bake(self.active_block.pixels());
+            self.active_block = Block::spawn();
         }
-
-        self.active_block.update(ctx, self.frame_index);
 
         self.canvas.render(ctx);
         self.active_block.render(ctx);

@@ -1,10 +1,11 @@
 use crate::prelude::*;
 
+#[derive(Copy, Clone, Debug)]
 enum BlockShape {
     L,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 enum Rotation {
     Deg0,
     Deg90,
@@ -43,6 +44,7 @@ impl Rotation {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct Block {
     shape: BlockShape,
     origin: Point,
@@ -62,40 +64,41 @@ impl Block {
         }
     }
 
-    pub fn update(&mut self, ctx: &BTerm, frame_idx: usize) {
+    pub fn spawn() -> Self {
+        Self::new(Point::new(SCREEN_WIDTH / 2, 1))
+    }
+
+    pub fn updated(&self, ctx: &BTerm, frame_idx: usize) -> Self {
+        let mut updated = self.clone();
+
         if let Some(key) = ctx.key {
-            self.origin.x += match key {
+            updated.origin.x += match key {
                 VirtualKeyCode::Left => -1,
                 VirtualKeyCode::Right => 1,
                 _ => 0,
             };
 
-            self.rotation = match key {
-                VirtualKeyCode::Up => self.rotation.rotate_counter_clockwise(),
-                VirtualKeyCode::Down => self.rotation.rotate_clockwise(),
-                _ => self.rotation,
+            updated.rotation = match key {
+                VirtualKeyCode::Up => updated.rotation.rotate_counter_clockwise(),
+                VirtualKeyCode::Down => updated.rotation.rotate_clockwise(),
+                _ => updated.rotation,
             };
         }
 
         if frame_idx % 4 == 0 {
-            self.origin.y += 1;
+            updated.origin.y += 1;
         }
+
+        updated
     }
 
     pub fn render(&self, ctx: &mut BTerm) {
-        let points = [
-            Point::new(0, -1),
-            Point::new(0, 0),
-            Point::new(0, 1),
-            Point::new(1, 1),
-        ];
-
-        for Pixel { position, color } in self.as_pixels() {
+        for Pixel { position, color } in self.pixels() {
             ctx.set(position.x, position.y, color, BLACK, to_cp437('█'));
         }
     }
 
-    pub fn as_pixels<'a>(&'a self) -> impl Iterator<Item = Pixel> + 'a {
+    pub fn points<'a>(&'a self) -> impl Iterator<Item = Point> + 'a {
         let points = [
             Point::new(0, -1),
             Point::new(0, 0),
@@ -106,9 +109,12 @@ impl Block {
         points
             .into_iter()
             .map(|p| self.rotation.apply_to(&p) + self.origin)
-            .map(|position| Pixel {
-                position,
-                color: RED,
-            })
+    }
+
+    pub fn pixels<'a>(&'a self) -> impl Iterator<Item = Pixel> + 'a {
+        self.points().map(|position| Pixel {
+            position,
+            color: RED,
+        })
     }
 }

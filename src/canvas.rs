@@ -28,6 +28,10 @@ impl Canvas {
         }
     }
 
+    pub fn is_empty(&self, p: &Point) -> bool {
+        point_to_index(p).map(|idx| self.pixels[idx]) == Some(None)
+    }
+
     pub fn bake(&mut self, new_pixels: impl Iterator<Item = Pixel>) {
         for (idx, color) in new_pixels.filter_map(|Pixel { position, color }| {
             point_to_index(&position).map(|idx| (idx, color))
