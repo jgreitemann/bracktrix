@@ -68,28 +68,30 @@ impl Block {
         Self::new(Point::new(SCREEN_WIDTH / 2, 1))
     }
 
-    pub fn updated(&self, ctx: &BTerm, frame_idx: usize) -> Self {
-        let mut updated = self.clone();
-
+    pub fn with_keys_applied(mut self, ctx: &BTerm) -> Self {
         if let Some(key) = ctx.key {
-            updated.origin.x += match key {
+            self.origin.x += match key {
                 VirtualKeyCode::Left => -1,
                 VirtualKeyCode::Right => 1,
                 _ => 0,
             };
 
-            updated.rotation = match key {
-                VirtualKeyCode::Up => updated.rotation.rotate_counter_clockwise(),
-                VirtualKeyCode::Down => updated.rotation.rotate_clockwise(),
-                _ => updated.rotation,
+            self.rotation = match key {
+                VirtualKeyCode::Up => self.rotation.rotate_counter_clockwise(),
+                VirtualKeyCode::Down => self.rotation.rotate_clockwise(),
+                _ => self.rotation,
             };
         }
 
+        self
+    }
+
+    pub fn with_gravity_applied(mut self, frame_idx: usize) -> Self {
         if frame_idx % 4 == 0 {
-            updated.origin.y += 1;
+            self.origin.y += 1;
         }
 
-        updated
+        self
     }
 
     pub fn render(&self, ctx: &mut BTerm) {

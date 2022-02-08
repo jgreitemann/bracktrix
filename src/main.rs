@@ -39,13 +39,20 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         ctx.cls();
 
-        let updated = self.active_block.updated(ctx, self.frame_index);
-        if self.block_fits_canvas(&updated) {
-            self.active_block = updated;
+        let mut updated = self.active_block.clone().with_keys_applied(ctx);
+
+        if !self.block_fits_canvas(&updated) {
+            // roll back
+            updated = self.active_block.clone();
+        }
+
+        updated = updated.with_gravity_applied(self.frame_index);
+        self.active_block = if self.block_fits_canvas(&updated) {
+            updated
         } else {
             self.canvas.bake(self.active_block.pixels());
-            self.active_block = Block::spawn();
-        }
+            Block::spawn()
+        };
 
         self.canvas.render(ctx);
         self.active_block.render(ctx);
