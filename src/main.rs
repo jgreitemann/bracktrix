@@ -54,6 +54,8 @@ impl GameState for State {
             Block::spawn()
         };
 
+        self.canvas.clear_full_rows();
+
         self.canvas.render(ctx);
         self.active_block.render(ctx);
 

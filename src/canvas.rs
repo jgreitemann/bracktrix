@@ -40,6 +40,18 @@ impl Canvas {
         }
     }
 
+    pub fn clear_full_rows(&mut self) {
+        for row in (0..SCREEN_HEIGHT).rev() {
+            let idx = point_to_index(&Point::new(0, row)).unwrap();
+            if self.pixels[idx..idx + SCREEN_WIDTH as usize]
+                .iter()
+                .all(|opt| opt.is_some())
+            {
+                self.pixels.copy_within(0..idx, SCREEN_WIDTH as usize);
+            }
+        }
+    }
+
     pub fn render(&self, ctx: &mut BTerm) {
         for (Point { x, y }, color) in self
             .pixels
