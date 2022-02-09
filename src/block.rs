@@ -3,6 +3,12 @@ use crate::prelude::*;
 #[derive(Copy, Clone, Debug)]
 enum BlockShape {
     L,
+    InvL,
+    Square,
+    S,
+    Z,
+    T,
+    I,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -55,8 +61,14 @@ impl Block {
     pub fn new(origin: Point) -> Self {
         let mut rng = RandomNumberGenerator::new();
         Self {
-            shape: match rng.range(0, 1) {
+            shape: match rng.range(0, 7) {
                 0 => BlockShape::L,
+                1 => BlockShape::InvL,
+                2 => BlockShape::Square,
+                3 => BlockShape::S,
+                4 => BlockShape::Z,
+                5 => BlockShape::T,
+                6 => BlockShape::I,
                 _ => panic!(),
             },
             origin,
@@ -101,12 +113,50 @@ impl Block {
     }
 
     pub fn points<'a>(&'a self) -> impl Iterator<Item = Point> + 'a {
-        let points = [
-            Point::new(0, -1),
-            Point::new(0, 0),
-            Point::new(0, 1),
-            Point::new(1, 1),
-        ];
+        let points = match self.shape {
+            BlockShape::L => [
+                Point::new(0, -1),
+                Point::new(0, 0),
+                Point::new(0, 1),
+                Point::new(1, 1),
+            ],
+            BlockShape::InvL => [
+                Point::new(0, -1),
+                Point::new(0, 0),
+                Point::new(0, 1),
+                Point::new(-1, 1),
+            ],
+            BlockShape::Square => [
+                Point::new(0, 0),
+                Point::new(1, 0),
+                Point::new(0, -1),
+                Point::new(1, -1),
+            ],
+            BlockShape::S => [
+                Point::new(0, 0),
+                Point::new(0, -1),
+                Point::new(1, -1),
+                Point::new(-1, 0),
+            ],
+            BlockShape::Z => [
+                Point::new(0, 0),
+                Point::new(0, -1),
+                Point::new(-1, -1),
+                Point::new(1, 0),
+            ],
+            BlockShape::T => [
+                Point::new(0, -1),
+                Point::new(0, 0),
+                Point::new(-1, 0),
+                Point::new(1, 0),
+            ],
+            BlockShape::I => [
+                Point::new(-1, 0),
+                Point::new(0, 0),
+                Point::new(1, 0),
+                Point::new(2, 0),
+            ],
+        };
 
         points
             .into_iter()
@@ -114,9 +164,15 @@ impl Block {
     }
 
     pub fn pixels<'a>(&'a self) -> impl Iterator<Item = Pixel> + 'a {
-        self.points().map(|position| Pixel {
-            position,
-            color: RED,
-        })
+        let color = match self.shape {
+            BlockShape::L => ORANGE3,
+            BlockShape::InvL => BLUE3,
+            BlockShape::Square => YELLOW3,
+            BlockShape::S => GREEN3,
+            BlockShape::Z => RED3,
+            BlockShape::T => PURPLE3,
+            BlockShape::I => TURQUOISE3,
+        };
+        self.points().map(move |position| Pixel { position, color })
     }
 }
