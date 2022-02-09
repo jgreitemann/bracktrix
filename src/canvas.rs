@@ -40,26 +40,48 @@ impl Canvas {
         }
     }
 
-    pub fn clear_full_rows(&mut self) {
-        for row in (0..SCREEN_HEIGHT).rev() {
+    pub fn full_rows(&self) -> Vec<i32> {
+        (0..SCREEN_HEIGHT)
+            .filter(|&row| {
+                let idx = point_to_index(&Point::new(0, row)).unwrap();
+                self.pixels[idx..idx + SCREEN_WIDTH as usize]
+                    .iter()
+                    .all(|opt| opt.is_some())
+            })
+            .collect()
+    }
+
+    pub fn clear_rows<I: Iterator<Item = i32>>(&mut self, rows: I) {
+        for row in rows {
             let idx = point_to_index(&Point::new(0, row)).unwrap();
-            if self.pixels[idx..idx + SCREEN_WIDTH as usize]
-                .iter()
-                .all(|opt| opt.is_some())
-            {
-                self.pixels.copy_within(0..idx, SCREEN_WIDTH as usize);
-            }
+            self.pixels.copy_within(0..idx, SCREEN_WIDTH as usize);
+            self.pixels[0..SCREEN_WIDTH as usize].fill(None);
         }
     }
 
-    pub fn render(&self, ctx: &mut BTerm) {
+    pub fn render(&self, ctx: &mut BTerm, animation_idx: usize) {
         for (Point { x, y }, color) in self
             .pixels
             .iter()
             .enumerate()
             .filter_map(|(i, o)| o.map(|c| (index_to_point(i), c)))
         {
-            ctx.set(x, y, color, BLACK, to_cp437('█'));
+            ctx.set(x, y, color, BLACK, to_cp437(BLOCK_GLYPHS[0]));
+        }
+
+        if animation_idx > 0 {
+            for y in self.full_rows() {
+                for x in 0..SCREEN_WIDTH {
+                    let color = self.pixels[point_to_index(&Point::new(x, y)).unwrap()].unwrap();
+                    ctx.set(
+                        x,
+                        y,
+                        color,
+                        BLACK,
+                        to_cp437(BLOCK_GLYPHS[(animation_idx + y as usize) % BLOCK_GLYPHS.len()]),
+                    );
+                }
+            }
         }
     }
 }
