@@ -28,8 +28,11 @@ impl Scaffold {
         let border_points: HashSet<_> = rect_outer_border_points(&self.canvas_rect())
             .chain(rect_outer_border_points(&self.preview_rect()))
             .collect();
-        for Point { x, y } in border_points {
-            ctx.set(x, y, WHITE, BLACK, to_cp437('═'));
+        for (Point { x, y }, glyph) in border_points
+            .iter()
+            .map(|p| (*p, border_glyph(p, &border_points)))
+        {
+            ctx.set(x, y, WHITE, BLACK, to_cp437(glyph));
         }
     }
 

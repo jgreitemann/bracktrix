@@ -2,17 +2,17 @@ use std::collections::HashSet;
 
 use bracket_lib::prelude::*;
 
-pub fn points_from_str(map_str: &str) -> HashSet<Point> {
-    map_str
-        .lines()
-        .enumerate()
-        .flat_map(|(y, line)| {
-            line.chars().enumerate().filter_map(move |(x, c)| match c {
-                '#' => Some(Point::new(x, y)),
-                _ => None,
-            })
+pub fn points_from_str<'a>(map_str: &'a str) -> impl Iterator<Item = Point> + 'a {
+    pixels_from_str(map_str).map(|(p, _)| p)
+}
+
+pub fn pixels_from_str<'a>(input: &'a str) -> impl Iterator<Item = (Point, char)> + 'a {
+    input.lines().enumerate().flat_map(|(y, line)| {
+        line.chars().enumerate().filter_map(move |(x, c)| match c {
+            '.' | ' ' => None,
+            c => Some((Point::new(x, y), c)),
         })
-        .collect()
+    })
 }
 
 mod test {
@@ -56,6 +56,9 @@ mod test {
         .into_iter()
         .collect();
 
-        assert_eq!(super::points_from_str(map_str), points);
+        assert_eq!(
+            super::points_from_str(map_str).collect::<HashSet<Point>>(),
+            points
+        );
     }
 }
