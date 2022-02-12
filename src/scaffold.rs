@@ -5,8 +5,8 @@ use bracket_lib::prelude::*;
 use crate::graphics::*;
 use crate::viewport::*;
 
-const PREVIEW_WIDTH: usize = 4;
-const PREVIEW_HEIGHT: usize = 3;
+const PREVIEW_WIDTH: usize = 5;
+const PREVIEW_HEIGHT: usize = 5;
 
 pub struct Scaffold {
     pub screen_width: usize,
@@ -32,7 +32,7 @@ impl Scaffold {
             .iter()
             .map(|p| (*p, border_glyph(p, &border_points)))
         {
-            ctx.set(x, y, WHITE, BLACK, to_cp437(glyph));
+            ctx.set(x, y, BLACK, WHITE, to_cp437(glyph));
         }
     }
 

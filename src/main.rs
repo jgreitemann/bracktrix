@@ -23,7 +23,7 @@ mod prelude {
 
 use prelude::*;
 
-const SCREEN_WIDTH: usize = 21;
+const SCREEN_WIDTH: usize = 22;
 const SCREEN_HEIGHT: usize = 25;
 const CANVAS_WIDTH: usize = 12;
 const CANVAS_HEIGHT: usize = 21;
