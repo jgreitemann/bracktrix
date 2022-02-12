@@ -1,10 +1,5 @@
 use crate::prelude::*;
 
-pub struct Pixel {
-    pub position: Point,
-    pub color: Color,
-}
-
 struct RowMajorMapping {
     width: usize,
     height: usize,
@@ -47,11 +42,17 @@ impl Canvas {
     }
 
     pub fn bake(&mut self, new_pixels: impl Iterator<Item = Pixel>) {
-        for (idx, color) in new_pixels.filter_map(|Pixel { position, color }| {
-            self.mapping
-                .point_to_index(&position)
-                .map(|idx| (idx, color))
-        }) {
+        for (idx, color) in new_pixels.filter_map(
+            |Pixel {
+                 position,
+                 color,
+                 glyph: _,
+             }| {
+                self.mapping
+                    .point_to_index(&position)
+                    .map(|idx| (idx, color))
+            },
+        ) {
             self.pixels[idx] = Some(color);
         }
     }
@@ -82,20 +83,25 @@ impl Canvas {
             .enumerate()
             .filter_map(|(i, o)| o.map(|c| (self.mapping.index_to_point(i), c)))
         {
-            viewport.set(&p, color, BLACK, BLOCK_GLYPHS[0]);
+            viewport.draw(&Pixel {
+                position: p,
+                color,
+                glyph: BLOCK_GLYPHS[0],
+            })
         }
 
         if animation_idx > 0 {
             for y in self.full_rows() {
                 for x in 0..self.mapping.width {
-                    let p = Point::new(x, y);
-                    let color = self.pixels[self.mapping.point_to_index(&p).unwrap()].unwrap();
-                    viewport.set(
-                        &p,
+                    let position = Point::new(x, y);
+                    let color =
+                        self.pixels[self.mapping.point_to_index(&position).unwrap()].unwrap();
+                    let glyph = BLOCK_GLYPHS[(animation_idx + y as usize) % BLOCK_GLYPHS.len()];
+                    viewport.draw(&Pixel {
+                        position,
                         color,
-                        BLACK,
-                        BLOCK_GLYPHS[(animation_idx + y as usize) % BLOCK_GLYPHS.len()],
-                    );
+                        glyph,
+                    })
                 }
             }
         }

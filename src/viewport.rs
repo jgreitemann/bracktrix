@@ -1,5 +1,6 @@
-use crate::Color;
 use bracket_lib::prelude::*;
+
+use crate::graphics::*;
 
 pub struct Viewport<'a> {
     rect: Rect,
@@ -11,11 +12,16 @@ impl<'a> Viewport<'a> {
         Self { rect, ctx }
     }
 
-    pub fn set(&mut self, p: &Point, fg: Color, bg: Color, glyph: char) {
-        let screen_point = *p + Point::new(self.rect.x1, self.rect.y1);
+    pub fn draw(&mut self, pix: &Pixel) {
+        let screen_point = pix.position + Point::new(self.rect.x1, self.rect.y1);
         if self.rect.point_in_rect(screen_point) {
-            self.ctx
-                .set(screen_point.x, screen_point.y, fg, bg, to_cp437(glyph));
+            self.ctx.set(
+                screen_point.x,
+                screen_point.y,
+                pix.color,
+                BLACK,
+                to_cp437(pix.glyph),
+            );
         }
     }
 }

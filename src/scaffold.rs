@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use bracket_lib::prelude::*;
 
-use crate::geometry::*;
+use crate::graphics::*;
 use crate::viewport::*;
 
 const PREVIEW_WIDTH: usize = 4;

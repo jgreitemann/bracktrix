@@ -1,6 +1,6 @@
 mod block;
 mod canvas;
-mod geometry;
+mod graphics;
 mod scaffold;
 mod viewport;
 
@@ -10,11 +10,10 @@ mod test_utils;
 mod prelude {
     pub use crate::block::*;
     pub use crate::canvas::*;
+    pub use crate::graphics::*;
     pub use crate::scaffold::*;
     pub use crate::viewport::*;
     pub use bracket_lib::prelude::*;
-
-    pub type Color = (u8, u8, u8);
 
     pub const ANIMATION_DURATION: usize = 16;
     pub const BLOCK_GLYPHS: [char; 16] = [

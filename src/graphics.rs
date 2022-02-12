@@ -1,6 +1,14 @@
 use bracket_lib::prelude::*;
 use std::collections::HashSet;
 
+pub type Color = (u8, u8, u8);
+
+pub struct Pixel {
+    pub position: Point,
+    pub color: Color,
+    pub glyph: char,
+}
+
 pub fn grow_rect(rect: &Rect, amount: i32) -> Rect {
     Rect {
         x1: rect.x1 - amount,

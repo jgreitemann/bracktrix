@@ -103,8 +103,8 @@ impl Block {
     }
 
     pub fn render(&self, mut viewport: Viewport) {
-        for Pixel { position, color } in self.pixels() {
-            viewport.set(&position, color, BLACK, '█');
+        for pix in self.pixels() {
+            viewport.draw(&pix);
         }
     }
 
@@ -169,6 +169,10 @@ impl Block {
             BlockShape::T => PURPLE3,
             BlockShape::I => TURQUOISE3,
         };
-        self.points().map(move |position| Pixel { position, color })
+        self.points().map(move |position| Pixel {
+            position,
+            color,
+            glyph: '█',
+        })
     }
 }
