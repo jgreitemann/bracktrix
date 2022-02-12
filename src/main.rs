@@ -1,7 +1,11 @@
 mod block;
 mod canvas;
+mod geometry;
 mod scaffold;
 mod viewport;
+
+#[cfg(test)]
+mod test_utils;
 
 mod prelude {
     pub use crate::block::*;
@@ -95,6 +99,7 @@ impl GameState for State {
             }
         }
 
+        self.scaffold.render(ctx);
         self.canvas
             .render(self.scaffold.canvas_viewport(ctx), self.animation_index);
         self.active_block.render(self.scaffold.canvas_viewport(ctx));
