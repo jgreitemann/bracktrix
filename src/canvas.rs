@@ -5,80 +5,96 @@ pub struct Pixel {
     pub color: Color,
 }
 
-pub struct Canvas {
-    pixels: Vec<Option<Color>>,
+struct RowMajorMapping {
+    width: usize,
+    height: usize,
 }
 
-fn point_to_index(p: &Point) -> Option<usize> {
-    if (0..SCREEN_WIDTH).contains(&p.x) && (0..SCREEN_HEIGHT).contains(&p.y) {
-        Some((p.y * SCREEN_WIDTH + p.x) as usize)
-    } else {
-        None
-    }
-}
-
-fn index_to_point(idx: usize) -> Point {
-    Point::new(idx % SCREEN_WIDTH as usize, idx / SCREEN_WIDTH as usize)
-}
-
-impl Canvas {
-    pub fn new() -> Self {
-        Self {
-            pixels: vec![None; (SCREEN_WIDTH * SCREEN_HEIGHT) as usize],
+impl RowMajorMapping {
+    fn point_to_index(&self, p: &Point) -> Option<usize> {
+        let (x, y) = (p.x as usize, p.y as usize);
+        if (0..self.width).contains(&x) && (0..self.height).contains(&y) {
+            Some(y * self.width + x)
+        } else {
+            None
         }
     }
 
+    fn index_to_point(&self, idx: usize) -> Point {
+        Point::new(idx % self.width, idx / self.width)
+    }
+}
+
+pub struct Canvas {
+    mapping: RowMajorMapping,
+    pixels: Vec<Option<Color>>,
+}
+
+impl Canvas {
+    pub fn new(width: usize, height: usize) -> Self {
+        Self {
+            mapping: RowMajorMapping { width, height },
+            pixels: vec![None; width * height],
+        }
+    }
+
+    pub fn spawn_point(&self) -> Point {
+        Point::new(self.mapping.width / 2, 1)
+    }
+
     pub fn is_empty(&self, p: &Point) -> bool {
-        point_to_index(p).map(|idx| self.pixels[idx]) == Some(None)
+        self.mapping.point_to_index(p).map(|idx| self.pixels[idx]) == Some(None)
     }
 
     pub fn bake(&mut self, new_pixels: impl Iterator<Item = Pixel>) {
         for (idx, color) in new_pixels.filter_map(|Pixel { position, color }| {
-            point_to_index(&position).map(|idx| (idx, color))
+            self.mapping
+                .point_to_index(&position)
+                .map(|idx| (idx, color))
         }) {
             self.pixels[idx] = Some(color);
         }
     }
 
-    pub fn full_rows(&self) -> Vec<i32> {
-        (0..SCREEN_HEIGHT)
+    pub fn full_rows(&self) -> Vec<usize> {
+        (0..self.mapping.height)
             .filter(|&row| {
-                let idx = point_to_index(&Point::new(0, row)).unwrap();
-                self.pixels[idx..idx + SCREEN_WIDTH as usize]
+                let idx = self.mapping.point_to_index(&Point::new(0, row)).unwrap();
+                self.pixels[idx..idx + self.mapping.width]
                     .iter()
                     .all(|opt| opt.is_some())
             })
             .collect()
     }
 
-    pub fn clear_rows<I: Iterator<Item = i32>>(&mut self, rows: I) {
+    pub fn clear_rows<I: Iterator<Item = usize>>(&mut self, rows: I) {
         for row in rows {
-            let idx = point_to_index(&Point::new(0, row)).unwrap();
-            self.pixels.copy_within(0..idx, SCREEN_WIDTH as usize);
-            self.pixels[0..SCREEN_WIDTH as usize].fill(None);
+            let idx = self.mapping.point_to_index(&Point::new(0, row)).unwrap();
+            self.pixels.copy_within(0..idx, self.mapping.width);
+            self.pixels[0..self.mapping.width].fill(None);
         }
     }
 
-    pub fn render(&self, ctx: &mut BTerm, animation_idx: usize) {
-        for (Point { x, y }, color) in self
+    pub fn render(&self, mut viewport: Viewport, animation_idx: usize) {
+        for (p, color) in self
             .pixels
             .iter()
             .enumerate()
-            .filter_map(|(i, o)| o.map(|c| (index_to_point(i), c)))
+            .filter_map(|(i, o)| o.map(|c| (self.mapping.index_to_point(i), c)))
         {
-            ctx.set(x, y, color, BLACK, to_cp437(BLOCK_GLYPHS[0]));
+            viewport.set(&p, color, BLACK, BLOCK_GLYPHS[0]);
         }
 
         if animation_idx > 0 {
             for y in self.full_rows() {
-                for x in 0..SCREEN_WIDTH {
-                    let color = self.pixels[point_to_index(&Point::new(x, y)).unwrap()].unwrap();
-                    ctx.set(
-                        x,
-                        y,
+                for x in 0..self.mapping.width {
+                    let p = Point::new(x, y);
+                    let color = self.pixels[self.mapping.point_to_index(&p).unwrap()].unwrap();
+                    viewport.set(
+                        &p,
                         color,
                         BLACK,
-                        to_cp437(BLOCK_GLYPHS[(animation_idx + y as usize) % BLOCK_GLYPHS.len()]),
+                        BLOCK_GLYPHS[(animation_idx + y as usize) % BLOCK_GLYPHS.len()],
                     );
                 }
             }

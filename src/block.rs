@@ -76,10 +76,6 @@ impl Block {
         }
     }
 
-    pub fn spawn() -> Self {
-        Self::new(Point::new(SCREEN_WIDTH / 2, 1))
-    }
-
     pub fn with_keys_applied(mut self, ctx: &BTerm) -> Self {
         if let Some(key) = ctx.key {
             self.origin.x += match key {
@@ -106,9 +102,9 @@ impl Block {
         self
     }
 
-    pub fn render(&self, ctx: &mut BTerm) {
+    pub fn render(&self, mut viewport: Viewport) {
         for Pixel { position, color } in self.pixels() {
-            ctx.set(position.x, position.y, color, BLACK, to_cp437('█'));
+            viewport.set(&position, color, BLACK, '█');
         }
     }
 

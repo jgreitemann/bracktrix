@@ -1,16 +1,17 @@
 mod block;
 mod canvas;
+mod scaffold;
+mod viewport;
 
 mod prelude {
     pub use crate::block::*;
     pub use crate::canvas::*;
+    pub use crate::scaffold::*;
+    pub use crate::viewport::*;
     pub use bracket_lib::prelude::*;
 
     pub type Color = (u8, u8, u8);
 
-    pub const SCREEN_WIDTH: i32 = 12;
-    pub const SCREEN_HEIGHT: i32 = 25;
-    pub const SCALE: i32 = 3;
     pub const ANIMATION_DURATION: usize = 16;
     pub const BLOCK_GLYPHS: [char; 16] = [
         '█', '▓', '▒', '░', '▒', '▓', '▒', '░', '▒', '▓', '▒', '░', '▒', '▓', '▒', '░',
@@ -19,20 +20,39 @@ mod prelude {
 
 use prelude::*;
 
+const SCREEN_WIDTH: usize = 21;
+const SCREEN_HEIGHT: usize = 25;
+const CANVAS_WIDTH: usize = 12;
+const CANVAS_HEIGHT: usize = 21;
+const SCALE: usize = 3;
+
 struct State {
     frame_index: usize,
     animation_index: usize,
+    scaffold: Scaffold,
     canvas: Canvas,
     active_block: Block,
 }
 
 impl State {
     fn new() -> Self {
+        let scaffold = Scaffold {
+            screen_width: SCREEN_WIDTH,
+            screen_height: SCREEN_HEIGHT,
+            canvas_width: CANVAS_WIDTH,
+            canvas_height: CANVAS_HEIGHT,
+        };
+
+        let canvas = Canvas::new(CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        let active_block = Block::new(canvas.spawn_point());
+
         Self {
             frame_index: 0,
             animation_index: 0,
-            canvas: Canvas::new(),
-            active_block: Block::spawn(),
+            scaffold,
+            canvas,
+            active_block,
         }
     }
 
@@ -58,7 +78,7 @@ impl GameState for State {
                 updated
             } else {
                 self.canvas.bake(self.active_block.pixels());
-                Block::spawn()
+                Block::new(self.canvas.spawn_point())
             };
         }
 
@@ -75,8 +95,9 @@ impl GameState for State {
             }
         }
 
-        self.canvas.render(ctx, self.animation_index);
-        self.active_block.render(ctx);
+        self.canvas
+            .render(self.scaffold.canvas_viewport(ctx), self.animation_index);
+        self.active_block.render(self.scaffold.canvas_viewport(ctx));
 
         self.frame_index += 1;
     }
@@ -85,7 +106,10 @@ impl GameState for State {
 fn main() -> BError {
     let ctx = BTermBuilder::simple(SCREEN_WIDTH, SCREEN_HEIGHT)?
         .with_fps_cap(30.)
-        .with_dimensions(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE)
+        .with_dimensions(
+            (SCREEN_WIDTH * SCALE) as i32,
+            (SCREEN_HEIGHT * SCALE) as i32,
+        )
         .with_title("Bracktrix")
         .build()?;
     main_loop(ctx, State::new())
