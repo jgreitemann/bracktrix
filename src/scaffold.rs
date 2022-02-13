@@ -5,7 +5,7 @@ use bracket_lib::prelude::*;
 use crate::graphics::*;
 use crate::viewport::*;
 
-const PREVIEW_WIDTH: usize = 5;
+const PREVIEW_WIDTH: usize = 6;
 const PREVIEW_HEIGHT: usize = 5;
 
 pub struct Scaffold {
@@ -22,6 +22,10 @@ impl Scaffold {
 
     pub fn preview_viewport<'a>(&self, ctx: &'a mut BTerm) -> Viewport<'a> {
         Viewport::new(self.preview_rect(), ctx)
+    }
+
+    pub fn preview_origin(&self) -> Point {
+        Point::new((PREVIEW_WIDTH - 1) / 2, (PREVIEW_HEIGHT - 1) / 2)
     }
 
     pub fn render(&self, ctx: &mut BTerm) {

@@ -23,7 +23,7 @@ mod prelude {
 
 use prelude::*;
 
-const SCREEN_WIDTH: usize = 22;
+const SCREEN_WIDTH: usize = 23;
 const SCREEN_HEIGHT: usize = 25;
 const CANVAS_WIDTH: usize = 12;
 const CANVAS_HEIGHT: usize = 21;
@@ -35,6 +35,7 @@ struct State {
     scaffold: Scaffold,
     canvas: Canvas,
     active_block: Block,
+    preview_block: Block,
 }
 
 impl State {
@@ -47,8 +48,9 @@ impl State {
         };
 
         let canvas = Canvas::new(CANVAS_WIDTH, CANVAS_HEIGHT);
+        let active_block = Block::new(BlockShape::random(), canvas.spawn_point());
 
-        let active_block = Block::new(canvas.spawn_point());
+        let preview_block = Block::new(BlockShape::random(), scaffold.preview_origin());
 
         Self {
             frame_index: 0,
@@ -56,6 +58,7 @@ impl State {
             scaffold,
             canvas,
             active_block,
+            preview_block,
         }
     }
 
@@ -81,7 +84,10 @@ impl GameState for State {
                 updated
             } else {
                 self.canvas.bake(self.active_block.pixels());
-                Block::new(self.canvas.spawn_point())
+                let next = Block::new(self.preview_block.shape(), self.canvas.spawn_point());
+                self.preview_block =
+                    Block::new(BlockShape::random(), self.scaffold.preview_origin());
+                next
             };
         }
 
@@ -102,6 +108,8 @@ impl GameState for State {
         self.canvas
             .render(self.scaffold.canvas_viewport(ctx), self.animation_index);
         self.active_block.render(self.scaffold.canvas_viewport(ctx));
+        self.preview_block
+            .render(self.scaffold.preview_viewport(ctx));
 
         self.frame_index += 1;
     }
