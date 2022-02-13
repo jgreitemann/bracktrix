@@ -9,10 +9,22 @@ pub fn points_from_str<'a>(map_str: &'a str) -> impl Iterator<Item = Point> + 'a
 pub fn pixels_from_str<'a>(input: &'a str) -> impl Iterator<Item = (Point, char)> + 'a {
     input.lines().enumerate().flat_map(|(y, line)| {
         line.chars().enumerate().filter_map(move |(x, c)| match c {
-            '.' | ' ' => None,
+            '.' | ' ' | '░' => None,
             c => Some((Point::new(x, y), c)),
         })
     })
+}
+
+pub fn str_from_points(points: impl Iterator<Item = Point>, width: usize, height: usize) -> String {
+    let mut chars = vec![vec!['░'; width]; height];
+    for Point { x, y } in points {
+        chars[y as usize][x as usize] = '█';
+    }
+    chars
+        .into_iter()
+        .map(|v| v.into_iter().collect::<String>())
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 mod test {

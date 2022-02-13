@@ -3,8 +3,8 @@ use crate::prelude::*;
 #[derive(Copy, Clone, Debug)]
 pub enum BlockShape {
     L,
-    InvL,
-    Square,
+    J,
+    O,
     S,
     Z,
     T,
@@ -16,8 +16,8 @@ impl BlockShape {
         let mut rng = RandomNumberGenerator::new();
         match rng.range(0, 7) {
             0 => BlockShape::L,
-            1 => BlockShape::InvL,
-            2 => BlockShape::Square,
+            1 => BlockShape::J,
+            2 => BlockShape::O,
             3 => BlockShape::S,
             4 => BlockShape::Z,
             5 => BlockShape::T,
@@ -29,8 +29,8 @@ impl BlockShape {
     fn color(&self) -> Color {
         match self {
             BlockShape::L => ORANGE3,
-            BlockShape::InvL => BLUE3,
-            BlockShape::Square => YELLOW3,
+            BlockShape::J => BLUE3,
+            BlockShape::O => YELLOW3,
             BlockShape::S => GREEN3,
             BlockShape::Z => RED3,
             BlockShape::T => PURPLE3,
@@ -41,18 +41,18 @@ impl BlockShape {
     fn points(&self) -> [Point; 4] {
         match self {
             BlockShape::L => [
-                Point::new(0, -1),
+                Point::new(-1, 0),
                 Point::new(0, 0),
-                Point::new(0, 1),
-                Point::new(1, 1),
+                Point::new(1, 0),
+                Point::new(1, -1),
             ],
-            BlockShape::InvL => [
-                Point::new(0, -1),
+            BlockShape::J => [
+                Point::new(-1, -1),
+                Point::new(-1, 0),
                 Point::new(0, 0),
-                Point::new(0, 1),
-                Point::new(-1, 1),
+                Point::new(1, 0),
             ],
-            BlockShape::Square => [
+            BlockShape::O => [
                 Point::new(0, 0),
                 Point::new(1, 0),
                 Point::new(0, -1),
@@ -77,10 +77,10 @@ impl BlockShape {
                 Point::new(1, 0),
             ],
             BlockShape::I => [
-                Point::new(-1, 0),
-                Point::new(0, 0),
-                Point::new(1, 0),
-                Point::new(2, 0),
+                Point::new(-1, -1),
+                Point::new(0, -1),
+                Point::new(1, -1),
+                Point::new(2, -1),
             ],
         }
     }
@@ -95,26 +95,6 @@ enum Rotation {
 }
 
 impl Rotation {
-    fn rotate_clockwise(&self) -> Self {
-        use Rotation::*;
-        match self {
-            Deg0 => Deg90,
-            Deg90 => Deg180,
-            Deg180 => Deg270,
-            Deg270 => Deg0,
-        }
-    }
-
-    fn rotate_counter_clockwise(&self) -> Self {
-        use Rotation::*;
-        match self {
-            Deg0 => Deg270,
-            Deg90 => Deg0,
-            Deg180 => Deg90,
-            Deg270 => Deg180,
-        }
-    }
-
     fn apply_to(&self, p: &Point) -> Point {
         match self {
             Rotation::Deg0 => p.clone(),
@@ -145,6 +125,26 @@ impl Block {
         self.shape
     }
 
+    pub fn rotate_clockwise(&mut self) {
+        use Rotation::*;
+        self.rotation = match self.rotation {
+            Deg0 => Deg90,
+            Deg90 => Deg180,
+            Deg180 => Deg270,
+            Deg270 => Deg0,
+        };
+    }
+
+    pub fn rotate_counter_clockwise(&mut self) {
+        use Rotation::*;
+        self.rotation = match self.rotation {
+            Deg0 => Deg270,
+            Deg90 => Deg0,
+            Deg180 => Deg90,
+            Deg270 => Deg180,
+        };
+    }
+
     pub fn with_keys_applied(mut self, ctx: &BTerm) -> Self {
         if let Some(key) = ctx.key {
             self.origin.x += match key {
@@ -153,10 +153,10 @@ impl Block {
                 _ => 0,
             };
 
-            self.rotation = match key {
-                VirtualKeyCode::Up => self.rotation.rotate_counter_clockwise(),
-                VirtualKeyCode::Down => self.rotation.rotate_clockwise(),
-                _ => self.rotation,
+            match key {
+                VirtualKeyCode::Up => self.rotate_counter_clockwise(),
+                VirtualKeyCode::Down => self.rotate_clockwise(),
+                _ => {}
             };
         }
 
@@ -191,5 +191,99 @@ impl Block {
             color,
             glyph: '█',
         })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::test_utils::*;
+
+    struct Rotating(Block);
+
+    impl Iterator for Rotating {
+        type Item = Block;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            let copy = self.0.clone();
+            self.0.rotate_clockwise();
+            Some(copy)
+        }
+    }
+
+    fn test_rotation_states(shape: BlockShape, expected: [[&str; 4]; 4]) {
+        let expected_strs: [String; 4] =
+            [0, 1, 2, 3].map(|i| expected.map(|line| line[i]).join("\n"));
+
+        for (block, exp) in Rotating(Block::new(shape, Point::new(2, 2))).zip(expected_strs) {
+            assert_eq!(str_from_points(block.points(), 6, 4), exp);
+        }
+    }
+
+    #[test]
+    fn rotation_states() {
+        test_rotation_states(
+            BlockShape::L,
+            [
+                ["░░░░░░", "░░░░░░", "░░░░░░", "░░░░░░"],
+                ["░░░█░░", "░░█░░░", "░░░░░░", "░██░░░"],
+                ["░███░░", "░░█░░░", "░███░░", "░░█░░░"],
+                ["░░░░░░", "░░██░░", "░█░░░░", "░░█░░░"],
+            ],
+        );
+        test_rotation_states(
+            BlockShape::J,
+            [
+                ["░░░░░░", "░░░░░░", "░░░░░░", "░░░░░░"],
+                ["░█░░░░", "░░██░░", "░░░░░░", "░░█░░░"],
+                ["░███░░", "░░█░░░", "░███░░", "░░█░░░"],
+                ["░░░░░░", "░░█░░░", "░░░█░░", "░██░░░"],
+            ],
+        );
+        test_rotation_states(
+            BlockShape::O,
+            [
+                ["░░░░░░", "░░░░░░", "░░░░░░", "░░░░░░"],
+                ["░░██░░", "░░██░░", "░░██░░", "░░██░░"],
+                ["░░██░░", "░░██░░", "░░██░░", "░░██░░"],
+                ["░░░░░░", "░░░░░░", "░░░░░░", "░░░░░░"],
+            ],
+        );
+        test_rotation_states(
+            BlockShape::S,
+            [
+                ["░░░░░░", "░░░░░░", "░░░░░░", "░░░░░░"],
+                ["░░██░░", "░░█░░░", "░░░░░░", "░█░░░░"],
+                ["░██░░░", "░░██░░", "░░██░░", "░██░░░"],
+                ["░░░░░░", "░░░█░░", "░██░░░", "░░█░░░"],
+            ],
+        );
+        test_rotation_states(
+            BlockShape::Z,
+            [
+                ["░░░░░░", "░░░░░░", "░░░░░░", "░░░░░░"],
+                ["░██░░░", "░░░█░░", "░░░░░░", "░░█░░░"],
+                ["░░██░░", "░░██░░", "░██░░░", "░██░░░"],
+                ["░░░░░░", "░░█░░░", "░░██░░", "░█░░░░"],
+            ],
+        );
+        test_rotation_states(
+            BlockShape::T,
+            [
+                ["░░░░░░", "░░░░░░", "░░░░░░", "░░░░░░"],
+                ["░░█░░░", "░░█░░░", "░░░░░░", "░░█░░░"],
+                ["░███░░", "░░██░░", "░███░░", "░██░░░"],
+                ["░░░░░░", "░░█░░░", "░░█░░░", "░░█░░░"],
+            ],
+        );
+        test_rotation_states(
+            BlockShape::I,
+            [
+                ["░░░░░░", "░░░█░░", "░░░░░░", "░░█░░░"],
+                ["░████░", "░░░█░░", "░░░░░░", "░░█░░░"],
+                ["░░░░░░", "░░░█░░", "░████░", "░░█░░░"],
+                ["░░░░░░", "░░░█░░", "░░░░░░", "░░█░░░"],
+            ],
+        );
     }
 }

@@ -62,7 +62,6 @@ mod test {
     use super::*;
     use crate::test_utils::*;
     use std::collections::HashSet;
-    use std::hash::Hash;
 
     #[test]
     fn rect_inner_border_points() {
