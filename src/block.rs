@@ -84,6 +84,14 @@ impl BlockShape {
             ],
         }
     }
+
+    fn rotation_offset(&self) -> Point {
+        use BlockShape::*;
+        match self {
+            L | J | S | Z | T => Point::zero(),
+            O | I => Point::new(1, -1),
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -178,10 +186,14 @@ impl Block {
     }
 
     pub fn points<'a>(&'a self) -> impl Iterator<Item = Point> + 'a {
-        self.shape
-            .points()
-            .into_iter()
-            .map(|p| self.rotation.apply_to(&p) + self.origin)
+        self.shape.points().into_iter().map(|p| {
+            (self
+                .rotation
+                .apply_to(&(p * 2 - self.shape.rotation_offset()))
+                + self.shape.rotation_offset())
+                / 2
+                + self.origin
+        })
     }
 
     pub fn pixels<'a>(&'a self) -> impl Iterator<Item = Pixel> + 'a {
