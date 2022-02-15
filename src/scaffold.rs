@@ -48,7 +48,7 @@ impl Scaffold {
         (self.screen_height - self.canvas_height - 2) / 2
     }
 
-    fn canvas_rect(&self) -> Rect {
+    pub fn canvas_rect(&self) -> Rect {
         Rect::with_size(
             self.hpad() + 1,
             self.vpad() + 1,
@@ -57,7 +57,7 @@ impl Scaffold {
         )
     }
 
-    fn preview_rect(&self) -> Rect {
+    pub fn preview_rect(&self) -> Rect {
         Rect::with_size(
             self.hpad() + self.canvas_width + 2,
             self.vpad() + 1,

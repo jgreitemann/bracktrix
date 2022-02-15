@@ -1,19 +1,26 @@
 mod block;
 mod canvas;
+mod components;
 mod graphics;
 mod scaffold;
+mod systems;
 mod viewport;
 
 #[cfg(test)]
 mod test_utils;
 
 mod prelude {
+    pub use bracket_lib::prelude::*;
+    pub use legion::world::SubWorld;
+    pub use legion::*;
+
     pub use crate::block::*;
     pub use crate::canvas::*;
+    pub use crate::components::*;
     pub use crate::graphics::*;
     pub use crate::scaffold::*;
+    pub use crate::systems::*;
     pub use crate::viewport::*;
-    pub use bracket_lib::prelude::*;
 
     pub const ANIMATION_DURATION: usize = 16;
     pub const BLOCK_GLYPHS: [char; 16] = [
@@ -30,16 +37,21 @@ const CANVAS_HEIGHT: usize = 21;
 const SCALE: usize = 3;
 
 struct State {
+    world: World,
+    resources: Resources,
+    systems: Schedule,
     frame_index: usize,
     animation_index: usize,
     scaffold: Scaffold,
     canvas: Canvas,
-    active_block: Block,
     preview_block: Block,
 }
 
 impl State {
     fn new() -> Self {
+        let mut world = World::default();
+        let mut resources = Resources::default();
+
         let scaffold = Scaffold {
             screen_width: SCREEN_WIDTH,
             screen_height: SCREEN_HEIGHT,
@@ -48,16 +60,27 @@ impl State {
         };
 
         let canvas = Canvas::new(CANVAS_WIDTH, CANVAS_HEIGHT);
-        let active_block = Block::new(BlockShape::random(), canvas.spawn_point());
+
+        world.push((
+            Pixels(BlockShape::random().pixels().into_iter().collect()),
+            Transform::identity().shifted_by(&canvas.spawn_point()),
+            Render {
+                console: 0,
+                z_order: 0,
+                viewport: scaffold.canvas_rect(),
+            },
+        ));
 
         let preview_block = Block::new(BlockShape::random(), scaffold.preview_origin());
 
         Self {
+            world,
+            resources,
+            systems: build_schedule(),
             frame_index: 0,
             animation_index: 0,
             scaffold,
             canvas,
-            active_block,
             preview_block,
         }
     }
@@ -71,6 +94,7 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         ctx.cls();
 
+        /*
         if self.animation_index == 0 {
             let mut updated = self.active_block.clone().with_keys_applied(ctx);
 
@@ -104,10 +128,15 @@ impl GameState for State {
             }
         }
 
+         */
+
+        self.resources.insert(ctx.key);
+
         self.scaffold.render(ctx);
         self.canvas
             .render(self.scaffold.canvas_viewport(ctx), self.animation_index);
-        self.active_block.render(self.scaffold.canvas_viewport(ctx));
+        self.systems.execute(&mut self.world, &mut self.resources);
+        render_draw_buffer(ctx).expect("Render error");
         self.preview_block
             .render(self.scaffold.preview_viewport(ctx));
 

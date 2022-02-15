@@ -85,6 +85,15 @@ impl BlockShape {
         }
     }
 
+    pub fn pixels(&self) -> [Pixel; 4] {
+        let color = self.color();
+        self.points().map(move |position| Pixel {
+            position,
+            color,
+            glyph: '█',
+        })
+    }
+
     fn rotation_offset(&self) -> Point {
         use BlockShape::*;
         match self {
@@ -95,7 +104,7 @@ impl BlockShape {
 }
 
 #[derive(Copy, Clone, Debug)]
-enum Rotation {
+pub enum Rotation {
     Deg0,
     Deg90,
     Deg180,
@@ -103,7 +112,7 @@ enum Rotation {
 }
 
 impl Rotation {
-    fn apply_to(&self, p: &Point) -> Point {
+    pub fn apply_to(&self, p: &Point) -> Point {
         match self {
             Rotation::Deg0 => p.clone(),
             Rotation::Deg90 => Point::new(-p.y, p.x),
