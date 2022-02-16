@@ -2,10 +2,7 @@ use crate::prelude::*;
 
 pub struct Position(pub Point);
 
-pub struct Pivot {
-    pub point: Point,
-    pub offset: Point,
-}
+pub struct Pivot(pub Point);
 
 pub struct PixelRender {
     pub colors: ColorPair,

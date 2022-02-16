@@ -68,10 +68,7 @@ impl State {
             .map(|pix| {
                 (
                     Position(pix.position + canvas.spawn_point()),
-                    Pivot {
-                        point: pix.position,
-                        offset: block.rotation_offset(),
-                    },
+                    Pivot(pix.position * 2 - block.rotation_offset()),
                     PixelRender {
                         colors: ColorPair::new(pix.color, BLACK),
                         glyph: to_cp437(pix.glyph),
