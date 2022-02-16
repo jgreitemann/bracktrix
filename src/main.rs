@@ -2,6 +2,7 @@ mod block;
 mod canvas;
 mod components;
 mod graphics;
+mod resources;
 mod scaffold;
 mod systems;
 mod viewport;
@@ -18,6 +19,7 @@ mod prelude {
     pub use crate::canvas::*;
     pub use crate::components::*;
     pub use crate::graphics::*;
+    pub use crate::resources::*;
     pub use crate::scaffold::*;
     pub use crate::systems::*;
     pub use crate::viewport::*;
@@ -145,6 +147,9 @@ impl GameState for State {
          */
 
         self.resources.insert(ctx.key);
+        self.resources.insert(Frame {
+            index: self.frame_index,
+        });
 
         self.scaffold.render(ctx);
         self.canvas
