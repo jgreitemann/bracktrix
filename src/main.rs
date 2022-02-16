@@ -63,6 +63,7 @@ impl State {
         let block = BlockShape::random();
         world.extend(block.pixels().into_iter().map(|pix| {
             (
+                Active {},
                 Position(pix.position + canvas.spawn_point()),
                 Pivot(pix.position * 2 - block.rotation_offset()),
                 PixelRender {
@@ -76,6 +77,7 @@ impl State {
         let preview_block = BlockShape::random();
         world.extend(preview_block.pixels().into_iter().map(|pix| {
             (
+                Preview {},
                 Position(pix.position + scaffold.preview_origin()),
                 Pivot(pix.position * 2 - preview_block.rotation_offset()),
                 PixelRender {

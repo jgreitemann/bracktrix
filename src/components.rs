@@ -1,5 +1,9 @@
 use crate::prelude::*;
 
+pub struct Active;
+
+pub struct Preview;
+
 pub struct Position(pub Point);
 
 pub struct Pivot(pub Point);
