@@ -44,7 +44,6 @@ struct State {
     animation_index: usize,
     scaffold: Scaffold,
     canvas: Canvas,
-    preview_block: Block,
 }
 
 impl State {
@@ -62,25 +61,30 @@ impl State {
         let canvas = Canvas::new(CANVAS_WIDTH, CANVAS_HEIGHT);
 
         let block = BlockShape::random();
-        block
-            .pixels()
-            .into_iter()
-            .map(|pix| {
-                (
-                    Position(pix.position + canvas.spawn_point()),
-                    Pivot(pix.position * 2 - block.rotation_offset()),
-                    PixelRender {
-                        colors: ColorPair::new(pix.color, BLACK),
-                        glyph: to_cp437(pix.glyph),
-                    },
-                    NewViewport(scaffold.canvas_rect()),
-                )
-            })
-            .for_each(|entity| {
-                world.push(entity);
-            });
+        world.extend(block.pixels().into_iter().map(|pix| {
+            (
+                Position(pix.position + canvas.spawn_point()),
+                Pivot(pix.position * 2 - block.rotation_offset()),
+                PixelRender {
+                    colors: ColorPair::new(pix.color, BLACK),
+                    glyph: to_cp437(pix.glyph),
+                },
+                NewViewport(scaffold.canvas_rect()),
+            )
+        }));
 
-        let preview_block = Block::new(BlockShape::random(), scaffold.preview_origin());
+        let preview_block = BlockShape::random();
+        world.extend(preview_block.pixels().into_iter().map(|pix| {
+            (
+                Position(pix.position + scaffold.preview_origin()),
+                Pivot(pix.position * 2 - preview_block.rotation_offset()),
+                PixelRender {
+                    colors: ColorPair::new(pix.color, BLACK),
+                    glyph: to_cp437(pix.glyph),
+                },
+                NewViewport(scaffold.preview_rect()),
+            )
+        }));
 
         Self {
             world,
@@ -90,7 +94,6 @@ impl State {
             animation_index: 0,
             scaffold,
             canvas,
-            preview_block,
         }
     }
 
@@ -146,8 +149,6 @@ impl GameState for State {
             .render(self.scaffold.canvas_viewport(ctx), self.animation_index);
         self.systems.execute(&mut self.world, &mut self.resources);
         render_draw_buffer(ctx).expect("Render error");
-        self.preview_block
-            .render(self.scaffold.preview_viewport(ctx));
 
         self.frame_index += 1;
     }
