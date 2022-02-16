@@ -1,35 +1,21 @@
 use crate::prelude::*;
 
 #[system]
-#[read_component(Pixels)]
-#[read_component(Transform)]
-#[read_component(Render)]
+#[read_component(Position)]
+#[read_component(PixelRender)]
+#[read_component(NewViewport)]
 pub fn pixel_render(world: &SubWorld) {
-    for (
-        Pixels(pixels),
-        &Transform {
-            translation,
-            rotation,
-        },
-        render,
-    ) in <(&Pixels, &Transform, &Render)>::query().iter(world)
-    {
-        let mut draw_batch = DrawBatch::new();
-        draw_batch.target(render.console);
+    let mut draw_batch = DrawBatch::new();
+    draw_batch.target(0);
 
-        for pix in pixels {
-            if let Some(screen_point) = to_screen(
-                &(rotation.apply_to(&pix.position) + translation),
-                &render.viewport,
-            ) {
-                draw_batch.set(
-                    screen_point,
-                    ColorPair::new(pix.color, BLACK),
-                    to_cp437(pix.glyph),
-                );
-            }
-        }
+    <(&Position, &PixelRender, &NewViewport)>::query()
+        .iter(world)
+        .filter_map(|(Position(pos), render, NewViewport(viewport_rect))| {
+            to_screen(&pos, &viewport_rect).map(|screen_point| (screen_point, render))
+        })
+        .for_each(|(screen_point, &PixelRender { colors, glyph })| {
+            draw_batch.set(screen_point, colors, glyph);
+        });
 
-        draw_batch.submit(render.z_order).expect("Batch error");
-    }
+    draw_batch.submit(0).expect("Batch error");
 }

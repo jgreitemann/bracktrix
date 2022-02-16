@@ -94,7 +94,7 @@ impl BlockShape {
         })
     }
 
-    fn rotation_offset(&self) -> Point {
+    pub fn rotation_offset(&self) -> Point {
         use BlockShape::*;
         match self {
             L | J | S | Z | T => Point::zero(),

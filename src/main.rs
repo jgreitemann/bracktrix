@@ -61,15 +61,27 @@ impl State {
 
         let canvas = Canvas::new(CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        world.push((
-            Pixels(BlockShape::random().pixels().into_iter().collect()),
-            Transform::identity().shifted_by(&canvas.spawn_point()),
-            Render {
-                console: 0,
-                z_order: 0,
-                viewport: scaffold.canvas_rect(),
-            },
-        ));
+        let block = BlockShape::random();
+        block
+            .pixels()
+            .into_iter()
+            .map(|pix| {
+                (
+                    Position(pix.position + canvas.spawn_point()),
+                    Pivot {
+                        point: pix.position,
+                        offset: block.rotation_offset(),
+                    },
+                    PixelRender {
+                        colors: ColorPair::new(pix.color, BLACK),
+                        glyph: to_cp437(pix.glyph),
+                    },
+                    NewViewport(scaffold.canvas_rect()),
+                )
+            })
+            .for_each(|entity| {
+                world.push(entity);
+            });
 
         let preview_block = Block::new(BlockShape::random(), scaffold.preview_origin());
 
