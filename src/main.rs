@@ -100,10 +100,6 @@ impl State {
             canvas,
         }
     }
-
-    fn block_fits_canvas(&self, block: &Block) -> bool {
-        block.points().all(|p| self.canvas.is_empty(&p))
-    }
 }
 
 impl GameState for State {

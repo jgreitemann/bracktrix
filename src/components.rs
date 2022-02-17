@@ -4,8 +4,10 @@ pub struct Active;
 
 pub struct Preview;
 
+#[derive(Copy, Clone)]
 pub struct Position(pub Point);
 
+#[derive(Copy, Clone)]
 pub struct Pivot(pub Point);
 
 pub struct PixelRender {

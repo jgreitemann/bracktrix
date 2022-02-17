@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use legion::query::{DefaultFilter, EntityFilter, View};
 
 #[system]
 #[write_component(Position)]
@@ -6,32 +7,43 @@ use crate::prelude::*;
 #[read_component(Active)]
 pub fn player_input(world: &mut SubWorld, #[resource] key: &Option<VirtualKeyCode>) {
     if let &Some(key) = key {
+        let filter = component::<Active>();
+        use VirtualKeyCode::*;
         match key {
-            VirtualKeyCode::Left => apply_translation(world, Point::new(-1, 0)),
-            VirtualKeyCode::Right => apply_translation(world, Point::new(1, 0)),
-            VirtualKeyCode::Up => apply_rotation(world, Rotation::Deg270),
-            VirtualKeyCode::Down => apply_rotation(world, Rotation::Deg90),
+            Left => try_apply_transform(world, filter, Translation(Point::new(-1, 0))),
+            Right => try_apply_transform(world, filter, Translation(Point::new(1, 0))),
+            Up => try_apply_transform(world, filter, Rotation::Deg270),
+            Down => try_apply_transform(world, filter, Rotation::Deg90),
             _ => {}
         }
     }
 }
 
-fn apply_translation(world: &mut SubWorld, delta: Point) {
-    for Position(pos) in <&mut Position>::query()
-        .filter(component::<Active>())
-        .iter_mut(world)
-    {
-        *pos += delta;
-    }
-}
+fn try_apply_transform<'a, V, F, T>(world: &'a mut SubWorld, filter: F, transform: T)
+where
+    T::Element: IntoQuery<View = V>,
+    V: View<'a, Element = T::Element> + DefaultFilter,
+    F: EntityFilter,
+    <V as DefaultFilter>::Filter: EntityFilter + std::ops::BitAnd + std::ops::BitAnd<F>,
+    <<V as DefaultFilter>::Filter as std::ops::BitAnd<F>>::Output: EntityFilter,
+    T: Transform<'a>,
+{
+    let mut query = <T::Element>::query().filter(filter);
 
-fn apply_rotation(world: &mut SubWorld, rotation: Rotation) {
-    for (Position(pos), Pivot(pivot)) in <(&mut Position, &mut Pivot)>::query()
-        .filter(component::<Active>())
+    query.for_each_mut(world, |elem| {
+        transform.apply_to(elem);
+    });
+
+    /*
+    Rollback:
+    let changed: Vec<_> = query
         .iter_mut(world)
-    {
-        let new_pivot = rotation.apply_to(&pivot);
-        *pos += (new_pivot - *pivot) / 2;
-        *pivot = new_pivot;
-    }
+        .map(|elem| transform.apply_to(elem))
+        .take(2)
+        .collect();
+
+    changed.into_iter().for_each(|elem| {
+        transform.inv().apply_to(elem);
+    });
+     */
 }
