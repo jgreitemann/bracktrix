@@ -42,7 +42,6 @@ struct State {
     world: World,
     resources: Resources,
     systems: Schedule,
-    frame_index: usize,
     animation_index: usize,
     canvas: Canvas,
 }
@@ -59,6 +58,9 @@ impl State {
             canvas_height: CANVAS_HEIGHT,
         };
         resources.insert(Screen(scaffold.screen_rect()));
+        resources.insert(Difficulty {
+            gravity_tick_speed: 6,
+        });
         world.extend(scaffold.border_entities());
 
         let canvas = Canvas::new(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -93,7 +95,6 @@ impl State {
             world,
             resources,
             systems: build_schedule(),
-            frame_index: 0,
             animation_index: 0,
             canvas,
         }
@@ -141,16 +142,11 @@ impl GameState for State {
          */
 
         self.resources.insert(ctx.key);
-        self.resources.insert(Frame {
-            index: self.frame_index,
-        });
 
         // self.canvas
         //     .render(self.scaffold.canvas_viewport(ctx), self.animation_index);
         self.systems.execute(&mut self.world, &mut self.resources);
         render_draw_buffer(ctx).expect("Render error");
-
-        self.frame_index += 1;
     }
 }
 

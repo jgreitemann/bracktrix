@@ -2,6 +2,6 @@ use crate::prelude::*;
 
 pub struct Screen(pub Rect);
 
-pub struct Frame {
-    pub index: usize,
+pub struct Difficulty {
+    pub gravity_tick_speed: usize,
 }
