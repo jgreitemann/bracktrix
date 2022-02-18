@@ -25,11 +25,18 @@ impl Scaffold {
         Viewport::new(self.preview_rect(), ctx)
     }
 
-    pub fn preview_origin(&self) -> Point {
-        Point::new((PREVIEW_WIDTH - 1) / 2, (PREVIEW_HEIGHT - 1) / 2)
+    pub fn spawn_point(&self) -> Point {
+        Point::new(self.hpad() + self.canvas_width / 2, self.vpad() + 2)
     }
 
-    pub fn border_entities(&self) -> Vec<(Position, PixelRender, NewViewport)> {
+    pub fn preview_origin(&self) -> Point {
+        Point::new(
+            self.hpad() + self.canvas_width + 2 + (PREVIEW_WIDTH - 1) / 2,
+            self.vpad() + 1 + (PREVIEW_HEIGHT - 1) / 2,
+        )
+    }
+
+    pub fn border_entities(&self) -> Vec<(Position, PixelRender)> {
         let unique_border_points: HashSet<_> = rect_outer_border_points(&self.canvas_rect())
             .chain(rect_outer_border_points(&self.preview_rect()))
             .collect();
@@ -43,7 +50,6 @@ impl Scaffold {
                         colors: ColorPair::new(BLACK, WHITE),
                         glyph: to_cp437(border_glyph(&p, &unique_border_points)),
                     },
-                    NewViewport(self.screen_rect()),
                 )
             })
             .collect()

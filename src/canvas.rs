@@ -33,10 +33,6 @@ impl Canvas {
         }
     }
 
-    pub fn spawn_point(&self) -> Point {
-        Point::new(self.mapping.width / 2, 1)
-    }
-
     pub fn is_empty(&self, p: &Point) -> bool {
         self.mapping.point_to_index(p).map(|idx| self.pixels[idx]) == Some(None)
     }

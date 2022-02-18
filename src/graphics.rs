@@ -4,22 +4,17 @@ use std::collections::HashSet;
 
 pub type Color = (u8, u8, u8);
 
-pub trait Transform<'a> {
-    type Element: 'a;
-    fn apply_to(&self, elem: Self::Element) -> Self::Element;
+pub trait Transform {
+    fn apply_to(&self, pos: &mut Position, pivot: &mut Pivot);
     fn inv(&self) -> Self;
 }
 
 pub struct Translation(pub Point);
 
-impl<'a> Transform<'a> for Translation {
-    type Element = &'a mut Position;
-
-    fn apply_to(&self, pos: &'a mut Position) -> Self::Element {
+impl Transform for Translation {
+    fn apply_to(&self, Position(point): &mut Position, _: &mut Pivot) {
         let &Translation(delta) = self;
-        let Position(point) = pos;
         *point += delta;
-        pos
     }
 
     fn inv(&self) -> Self {
@@ -47,15 +42,11 @@ impl Rotation {
     }
 }
 
-impl<'a> Transform<'a> for Rotation {
-    type Element = (&'a mut Position, &'a mut Pivot);
-
-    fn apply_to(&self, elem: (&'a mut Position, &'a mut Pivot)) -> Self::Element {
-        let (Position(pos), Pivot(pivot)) = elem;
+impl Transform for Rotation {
+    fn apply_to(&self, Position(pos): &mut Position, Pivot(pivot): &mut Pivot) {
         let new_pivot = self.applied_to(pivot);
         *pos += (new_pivot - *pivot) / 2;
         *pivot = new_pivot;
-        elem
     }
 
     fn inv(&self) -> Self {

@@ -1,3 +1,4 @@
+mod collision;
 mod gravity;
 mod pixel_renderer;
 mod player_input;

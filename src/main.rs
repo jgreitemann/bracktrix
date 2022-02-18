@@ -58,6 +58,7 @@ impl State {
             canvas_width: CANVAS_WIDTH,
             canvas_height: CANVAS_HEIGHT,
         };
+        resources.insert(Screen(scaffold.screen_rect()));
         world.extend(scaffold.border_entities());
 
         let canvas = Canvas::new(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -66,13 +67,12 @@ impl State {
         world.extend(block.pixels().into_iter().map(|pix| {
             (
                 Active {},
-                Position(pix.position + canvas.spawn_point()),
+                Position(pix.position + scaffold.spawn_point()),
                 Pivot(pix.position * 2 - block.rotation_offset()),
                 PixelRender {
                     colors: ColorPair::new(pix.color, BLACK),
                     glyph: to_cp437(pix.glyph),
                 },
-                NewViewport(scaffold.canvas_rect()),
             )
         }));
 
@@ -86,7 +86,6 @@ impl State {
                     colors: ColorPair::new(pix.color, BLACK),
                     glyph: to_cp437(pix.glyph),
                 },
-                NewViewport(scaffold.preview_rect()),
             )
         }));
 
