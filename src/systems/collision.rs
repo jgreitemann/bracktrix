@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub fn apply_if_collision_free(world: &mut SubWorld, transform: impl Transform) {
+pub fn apply_if_collision_free(world: &mut SubWorld, transform: impl Transform) -> bool {
     let moved: Vec<_> = <(&mut Position, &mut Pivot)>::query()
         .filter(component::<Active>())
         .iter_mut(world)
@@ -21,4 +21,6 @@ pub fn apply_if_collision_free(world: &mut SubWorld, transform: impl Transform) 
             .filter(component::<Active>())
             .for_each_mut(world, |(pos, pivot)| inverse.apply_to(pos, pivot));
     }
+
+    !did_collide
 }

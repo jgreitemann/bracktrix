@@ -14,7 +14,7 @@ pub fn player_input(world: &mut SubWorld, #[resource] key: &Option<VirtualKeyCod
             Right => apply_if_collision_free(world, Translation(Point::new(1, 0))),
             Up => apply_if_collision_free(world, Rotation::Deg270),
             Down => apply_if_collision_free(world, Rotation::Deg90),
-            _ => {}
-        }
+            _ => false,
+        };
     }
 }
