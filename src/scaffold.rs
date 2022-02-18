@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use bracket_lib::prelude::*;
 
+use crate::components::*;
 use crate::graphics::*;
 use crate::viewport::*;
 
@@ -28,16 +29,24 @@ impl Scaffold {
         Point::new((PREVIEW_WIDTH - 1) / 2, (PREVIEW_HEIGHT - 1) / 2)
     }
 
-    pub fn render(&self, ctx: &mut BTerm) {
-        let border_points: HashSet<_> = rect_outer_border_points(&self.canvas_rect())
+    pub fn border_entities(&self) -> Vec<(Position, PixelRender, NewViewport)> {
+        let unique_border_points: HashSet<_> = rect_outer_border_points(&self.canvas_rect())
             .chain(rect_outer_border_points(&self.preview_rect()))
             .collect();
-        for (Point { x, y }, glyph) in border_points
+
+        unique_border_points
             .iter()
-            .map(|p| (*p, border_glyph(p, &border_points)))
-        {
-            ctx.set(x, y, BLACK, WHITE, to_cp437(glyph));
-        }
+            .map(|&p| {
+                (
+                    Position(p),
+                    PixelRender {
+                        colors: ColorPair::new(BLACK, WHITE),
+                        glyph: to_cp437(border_glyph(&p, &unique_border_points)),
+                    },
+                    NewViewport(self.screen_rect()),
+                )
+            })
+            .collect()
     }
 
     fn hpad(&self) -> usize {
@@ -46,6 +55,10 @@ impl Scaffold {
 
     fn vpad(&self) -> usize {
         (self.screen_height - self.canvas_height - 2) / 2
+    }
+
+    pub fn screen_rect(&self) -> Rect {
+        Rect::with_size(0, 0, self.screen_width, self.screen_height)
     }
 
     pub fn canvas_rect(&self) -> Rect {

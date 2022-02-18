@@ -44,7 +44,6 @@ struct State {
     systems: Schedule,
     frame_index: usize,
     animation_index: usize,
-    scaffold: Scaffold,
     canvas: Canvas,
 }
 
@@ -59,6 +58,7 @@ impl State {
             canvas_width: CANVAS_WIDTH,
             canvas_height: CANVAS_HEIGHT,
         };
+        world.extend(scaffold.border_entities());
 
         let canvas = Canvas::new(CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -96,7 +96,6 @@ impl State {
             systems: build_schedule(),
             frame_index: 0,
             animation_index: 0,
-            scaffold,
             canvas,
         }
     }
@@ -147,9 +146,8 @@ impl GameState for State {
             index: self.frame_index,
         });
 
-        self.scaffold.render(ctx);
-        self.canvas
-            .render(self.scaffold.canvas_viewport(ctx), self.animation_index);
+        // self.canvas
+        //     .render(self.scaffold.canvas_viewport(ctx), self.animation_index);
         self.systems.execute(&mut self.world, &mut self.resources);
         render_draw_buffer(ctx).expect("Render error");
 
