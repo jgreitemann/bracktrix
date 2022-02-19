@@ -47,7 +47,7 @@ impl State {
         resources.insert(GameMode::Play);
         resources.insert(RandomNumberGenerator::new());
         resources.insert(Difficulty {
-            gravity_tick_speed: 4,
+            gravity_tick_speed: 8,
         });
 
         let scaffold = Scaffold {
@@ -100,7 +100,7 @@ impl GameState for State {
 
 fn main() -> BError {
     let ctx = BTermBuilder::new()
-        .with_fps_cap(30.)
+        .with_fps_cap(60.)
         .with_title("Bracktrix")
         .with_dimensions(
             (SCREEN_WIDTH * SCALE) as i32,
