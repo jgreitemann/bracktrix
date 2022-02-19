@@ -7,15 +7,15 @@ pub struct Difficulty {
 }
 
 pub struct BlockEntityStore {
-    pub active: Vec<Entity>,
-    pub preview: Vec<Entity>,
+    pub active: Option<[Entity; 4]>,
+    pub preview: Option<[Entity; 4]>,
 }
 
 impl BlockEntityStore {
     pub fn new() -> Self {
         BlockEntityStore {
-            active: Vec::new(),
-            preview: Vec::new(),
+            active: None,
+            preview: None,
         }
     }
 }

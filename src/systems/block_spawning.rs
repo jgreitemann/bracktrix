@@ -7,12 +7,12 @@ pub fn block_spawning(
     #[resource] store: &mut BlockEntityStore,
     #[resource] spawn_points: &BlockSpawnPoints,
 ) {
-    if store.preview.is_empty() {
+    if store.preview.is_none() {
         let block = BlockShape::random();
         let spawn = spawn_points.preview_block_spawn;
         let offset = block.rotation_offset();
-        store.preview = cmd
-            .extend(block.pixels().into_iter().map(move |pix| {
+        store.preview = Some(
+            <[Entity; 4]>::try_from(cmd.extend(block.pixels().map(move |pix| {
                 (
                     Preview {},
                     Position(pix.position + spawn),
@@ -22,20 +22,23 @@ pub fn block_spawning(
                         glyph: to_cp437(pix.glyph),
                     },
                 )
-            }))
-            .to_vec();
+            })))
+            .unwrap(),
+        );
     }
 
-    if store.active.is_empty() {
-        for entity in &store.preview {
-            cmd.remove_component::<Preview>(*entity);
-            cmd.add_component(*entity, Active {});
+    if store.active.is_none() {
+        if let Some(preview_entities) = std::mem::replace(&mut store.preview, None) {
+            for entity in preview_entities {
+                cmd.remove_component::<Preview>(entity);
+                cmd.add_component(entity, Active {});
+            }
+            let translation =
+                Translation(spawn_points.active_block_spawn - spawn_points.preview_block_spawn);
+            cmd.exec_mut(move |world, _| {
+                super::collision::transform_active_entities(world, &translation);
+            });
+            store.active = Some(preview_entities);
         }
-        let translation =
-            Translation(spawn_points.active_block_spawn - spawn_points.preview_block_spawn);
-        cmd.exec_mut(move |world, _| {
-            super::collision::transform_active_entities(world, &translation);
-        });
-        store.active = std::mem::replace(&mut store.preview, Vec::new());
     }
 }
