@@ -7,6 +7,7 @@ pub trait Transform {
     fn inv(&self) -> Self;
 }
 
+#[derive(Copy, Clone, Debug)]
 pub struct Translation(pub Point);
 
 impl Transform for Translation {

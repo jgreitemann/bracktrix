@@ -1,5 +1,11 @@
 use crate::prelude::*;
 
+#[derive(Copy, Clone, Eq, PartialEq)]
+pub enum GameMode {
+    Play,
+    Menu,
+}
+
 pub struct Screen(pub Rect);
 
 pub struct Difficulty {

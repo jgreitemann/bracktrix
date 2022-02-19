@@ -23,8 +23,11 @@ pub fn block_spawning(
 
         let translation =
             Translation(spawn_points.active_block_spawn - spawn_points.preview_block_spawn);
-        cmd.exec_mut(move |world, _| {
-            super::collision::transform_active_entities(world, &translation);
+        cmd.exec_mut(move |world, resources| {
+            let (mut subworld, _) = world.split::<(&mut Position, &mut Pivot, &Active)>();
+            if !super::collision::apply_if_collision_free(&mut subworld, translation) {
+                *resources.get_mut::<GameMode>().unwrap() = GameMode::Menu;
+            }
         });
     }
 }

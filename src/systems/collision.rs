@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub fn transform_active_entities<W: EntityStore, T: Transform>(world: &mut W, transform: &T) {
+fn transform_active_entities<W: EntityStore, T: Transform>(world: &mut W, transform: &T) {
     <(&mut Position, &mut Pivot)>::query()
         .filter(component::<Active>())
         .for_each_mut(world, |(pos, pivot)| transform.apply_to(pos, pivot));
