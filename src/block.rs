@@ -12,8 +12,7 @@ pub enum BlockShape {
 }
 
 impl BlockShape {
-    pub fn random() -> Self {
-        let mut rng = RandomNumberGenerator::new();
+    pub fn random(rng: &mut RandomNumberGenerator) -> Self {
         match rng.range(0, 7) {
             0 => BlockShape::L,
             1 => BlockShape::J,

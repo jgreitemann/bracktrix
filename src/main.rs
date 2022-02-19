@@ -42,6 +42,11 @@ impl State {
         let mut world = World::default();
         let mut resources = Resources::default();
 
+        resources.insert(RandomNumberGenerator::new());
+        resources.insert(Difficulty {
+            gravity_tick_speed: 4,
+        });
+
         let scaffold = Scaffold {
             screen_width: SCREEN_WIDTH,
             screen_height: SCREEN_HEIGHT,
@@ -49,9 +54,6 @@ impl State {
             canvas_height: CANVAS_HEIGHT,
         };
         resources.insert(Screen(scaffold.screen_rect()));
-        resources.insert(Difficulty {
-            gravity_tick_speed: 4,
-        });
         resources.insert(BlockSpawnPoints {
             active_block_spawn: scaffold.spawn_point(),
             preview_block_spawn: scaffold.preview_origin(),

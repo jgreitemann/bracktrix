@@ -7,9 +7,10 @@ pub fn block_spawning(
     world: &SubWorld,
     cmd: &mut CommandBuffer,
     #[resource] spawn_points: &BlockSpawnPoints,
+    #[resource] rng: &mut RandomNumberGenerator,
 ) {
     if <&Preview>::query().iter(world).next().is_none() {
-        let block = BlockShape::random();
+        let block = BlockShape::random(rng);
         let spawn = spawn_points.preview_block_spawn;
         let offset = block.rotation_offset();
         cmd.extend(block.pixels().map(move |pix| {
