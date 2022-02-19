@@ -4,7 +4,6 @@ mod graphics;
 mod resources;
 mod scaffold;
 mod systems;
-mod viewport;
 
 #[cfg(test)]
 mod test_utils;
@@ -21,7 +20,6 @@ mod prelude {
     pub use crate::resources::*;
     pub use crate::scaffold::*;
     pub use crate::systems::*;
-    pub use crate::viewport::*;
 
     pub const SCREEN_WIDTH: usize = 23;
     pub const SCREEN_HEIGHT: usize = 25;

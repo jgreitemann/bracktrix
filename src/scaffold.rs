@@ -4,7 +4,6 @@ use bracket_lib::prelude::*;
 
 use crate::components::*;
 use crate::graphics::*;
-use crate::viewport::*;
 
 const PREVIEW_WIDTH: usize = 6;
 const PREVIEW_HEIGHT: usize = 5;
@@ -17,14 +16,6 @@ pub struct Scaffold {
 }
 
 impl Scaffold {
-    pub fn canvas_viewport<'a>(&self, ctx: &'a mut BTerm) -> Viewport<'a> {
-        Viewport::new(self.canvas_rect(), ctx)
-    }
-
-    pub fn preview_viewport<'a>(&self, ctx: &'a mut BTerm) -> Viewport<'a> {
-        Viewport::new(self.preview_rect(), ctx)
-    }
-
     pub fn spawn_point(&self) -> Point {
         Point::new(self.hpad() + self.canvas_width / 2, self.vpad() + 2)
     }

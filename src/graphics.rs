@@ -4,6 +4,15 @@ use std::collections::HashSet;
 
 pub type Color = (u8, u8, u8);
 
+pub fn to_screen(position: &Point, rect: &Rect) -> Option<Point> {
+    let screen_point = *position + Point::new(rect.x1, rect.y1);
+    if rect.point_in_rect(screen_point) {
+        Some(screen_point)
+    } else {
+        None
+    }
+}
+
 pub trait Transform {
     fn apply_to(&self, pos: &mut Position, pivot: &mut Pivot);
     fn inv(&self) -> Self;
@@ -23,6 +32,7 @@ impl Transform for Translation {
 }
 
 #[derive(Copy, Clone, Debug)]
+#[allow(dead_code)]
 pub enum Rotation {
     Deg0,
     Deg90,
