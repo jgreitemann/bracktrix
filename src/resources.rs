@@ -16,6 +16,7 @@ pub struct Difficulty {
 #[derive(Default)]
 pub struct Scoring {
     pub lines_cleared: usize,
+    pub bracktrixes: usize,
 }
 
 impl Scoring {
@@ -23,6 +24,7 @@ impl Scoring {
         use Metric::*;
         match metric {
             LinesCleared => self.lines_cleared,
+            NumberOfBracktrixes => self.bracktrixes,
         }
     }
 }

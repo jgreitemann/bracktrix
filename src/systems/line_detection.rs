@@ -19,6 +19,9 @@ pub fn line_detection(
         .collect_vec();
 
     scoring.lines_cleared += completed_lines.len();
+    if completed_lines.len() == 4 {
+        scoring.bracktrixes += 1;
+    }
 
     completed_lines
         .into_iter()

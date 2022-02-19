@@ -76,6 +76,13 @@ impl State {
             DisplayText("Lines cleared:".to_string()),
             Metric::LinesCleared,
         ));
+        world.push((
+            ScoreboardItem {
+                rect: scoreboard_rect_iter.next().unwrap(),
+            },
+            DisplayText("# Bracktrixes:".to_string()),
+            Metric::NumberOfBracktrixes,
+        ));
 
         Self {
             world,
