@@ -1,3 +1,4 @@
+mod block_spawning;
 mod collision;
 mod gravity;
 mod pixel_renderer;
@@ -10,5 +11,6 @@ pub fn build_schedule() -> Schedule {
         .add_system(player_input::player_input_system())
         .add_system(pixel_renderer::pixel_render_system())
         .add_system(gravity::gravity_system(0))
+        .add_system(block_spawning::block_spawning_system())
         .build()
 }

@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use legion::query::{DefaultFilter, EntityFilter, View};
 
 #[system]
 #[write_component(Position)]

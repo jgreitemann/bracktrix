@@ -58,33 +58,13 @@ impl State {
         resources.insert(Difficulty {
             gravity_tick_speed: 6,
         });
+        resources.insert(BlockEntityStore::new());
+        resources.insert(BlockSpawnPoints {
+            active_block_spawn: scaffold.spawn_point(),
+            preview_block_spawn: scaffold.preview_origin(),
+        });
+
         world.extend(scaffold.border_entities());
-
-        let block = BlockShape::random();
-        world.extend(block.pixels().into_iter().map(|pix| {
-            (
-                Active {},
-                Position(pix.position + scaffold.spawn_point()),
-                Pivot(pix.position * 2 - block.rotation_offset()),
-                PixelRender {
-                    colors: ColorPair::new(pix.color, BLACK),
-                    glyph: to_cp437(pix.glyph),
-                },
-            )
-        }));
-
-        let preview_block = BlockShape::random();
-        world.extend(preview_block.pixels().into_iter().map(|pix| {
-            (
-                Preview {},
-                Position(pix.position + scaffold.preview_origin()),
-                Pivot(pix.position * 2 - preview_block.rotation_offset()),
-                PixelRender {
-                    colors: ColorPair::new(pix.color, BLACK),
-                    glyph: to_cp437(pix.glyph),
-                },
-            )
-        }));
 
         Self {
             world,
