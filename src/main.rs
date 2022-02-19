@@ -23,22 +23,20 @@ mod prelude {
     pub use crate::systems::*;
     pub use crate::viewport::*;
 
-    pub const ANIMATION_DURATION: usize = 16;
+    pub const SCREEN_WIDTH: usize = 23;
+    pub const SCREEN_HEIGHT: usize = 25;
+    pub const CANVAS_WIDTH: usize = 12;
+    pub const CANVAS_HEIGHT: usize = 21;
 }
 
 use prelude::*;
 
-const SCREEN_WIDTH: usize = 23;
-const SCREEN_HEIGHT: usize = 25;
-const CANVAS_WIDTH: usize = 12;
-const CANVAS_HEIGHT: usize = 21;
 const SCALE: usize = 3;
 
 struct State {
     world: World,
     resources: Resources,
     systems: Schedule,
-    animation_index: usize,
 }
 
 impl State {
@@ -54,7 +52,7 @@ impl State {
         };
         resources.insert(Screen(scaffold.screen_rect()));
         resources.insert(Difficulty {
-            gravity_tick_speed: 6,
+            gravity_tick_speed: 4,
         });
         resources.insert(BlockSpawnPoints {
             active_block_spawn: scaffold.spawn_point(),
@@ -67,7 +65,6 @@ impl State {
             world,
             resources,
             systems: build_schedule(),
-            animation_index: 0,
         }
     }
 }

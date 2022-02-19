@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use crate::CANVAS_WIDTH;
 
 #[system]
 #[read_component(Settled)]
@@ -12,7 +11,7 @@ pub fn line_detection(world: &SubWorld, cmd: &mut CommandBuffer) {
         .map(|(entity, Position(Point { y, .. }))| (y, entity))
         .into_group_map()
         .into_values()
-        .filter(|line| line.len() == CANVAS_WIDTH)
+        .filter(|line| line.len() >= CANVAS_WIDTH)
         .flatten()
         .for_each(|&entity| cmd.add_component(entity, Flagged::new()));
 }

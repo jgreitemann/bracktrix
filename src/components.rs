@@ -24,7 +24,7 @@ pub struct Flagged {
 impl Flagged {
     pub fn new() -> Self {
         Flagged {
-            frames_till_death: 16,
+            frames_till_death: 0,
         }
     }
 }
