@@ -1,5 +1,4 @@
 mod block;
-mod canvas;
 mod components;
 mod graphics;
 mod resources;
@@ -16,7 +15,6 @@ mod prelude {
     pub use legion::*;
 
     pub use crate::block::*;
-    pub use crate::canvas::*;
     pub use crate::components::*;
     pub use crate::graphics::*;
     pub use crate::resources::*;
@@ -43,7 +41,6 @@ struct State {
     resources: Resources,
     systems: Schedule,
     animation_index: usize,
-    canvas: Canvas,
 }
 
 impl State {
@@ -62,8 +59,6 @@ impl State {
             gravity_tick_speed: 6,
         });
         world.extend(scaffold.border_entities());
-
-        let canvas = Canvas::new(CANVAS_WIDTH, CANVAS_HEIGHT);
 
         let block = BlockShape::random();
         world.extend(block.pixels().into_iter().map(|pix| {
@@ -96,7 +91,6 @@ impl State {
             resources,
             systems: build_schedule(),
             animation_index: 0,
-            canvas,
         }
     }
 }
