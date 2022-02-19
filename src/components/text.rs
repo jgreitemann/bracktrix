@@ -1,5 +1,11 @@
+use crate::prelude::*;
+
 pub struct MenuItem {
     pub rank: usize,
+}
+
+pub struct ScoreboardItem {
+    pub rect: Rect,
 }
 
 pub struct DisplayText(pub String);

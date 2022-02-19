@@ -6,12 +6,14 @@ mod line_detection;
 mod menu_renderer;
 mod pixel_renderer;
 mod player_input;
+mod scoreboard_renderer;
 
 use crate::prelude::*;
 
 pub fn build_base_schedule() -> Schedule {
     Schedule::builder()
         .add_system(pixel_renderer::pixel_render_system())
+        .add_system(scoreboard_renderer::scoreboard_render_system())
         .build()
 }
 

@@ -11,7 +11,7 @@ const V_PADDING: usize = 2;
 #[read_component(Metric)]
 pub fn menu_render(world: &SubWorld, #[resource] scoring: &Scoring) {
     let mut draw_batch = DrawBatch::new();
-    draw_batch.target(1);
+    draw_batch.target(2);
     draw_batch.cls_color((0, 0, 0, 200));
 
     let entries = <(&MenuItem, &DisplayText, Option<&Metric>)>::query()

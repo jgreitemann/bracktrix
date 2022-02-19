@@ -1,9 +1,6 @@
 use std::collections::HashSet;
 
-use bracket_lib::prelude::*;
-
-use crate::components::*;
-use crate::graphics::*;
+use crate::prelude::*;
 
 const PREVIEW_WIDTH: usize = 6;
 const PREVIEW_HEIGHT: usize = 5;
@@ -74,5 +71,12 @@ impl Scaffold {
             PREVIEW_WIDTH,
             PREVIEW_HEIGHT,
         )
+    }
+
+    pub fn score_rects(&self) -> impl Iterator<Item = Rect> {
+        let x = TEXT_SCALE * (self.hpad() + 2 + self.canvas_width) + 1;
+        let start_y = TEXT_SCALE * (self.vpad() + 3 + PREVIEW_HEIGHT);
+        let width = TEXT_SCALE * self.screen_width - x - 1;
+        (0..).map(move |i| Rect::with_size(x, start_y + (5 * i), width, 2))
     }
 }

@@ -25,11 +25,11 @@ mod prelude {
     pub const SCREEN_HEIGHT: usize = 25;
     pub const CANVAS_WIDTH: usize = 12;
     pub const CANVAS_HEIGHT: usize = 21;
+    pub const SCALE: usize = 3;
+    pub const TEXT_SCALE: usize = 2;
 }
 
 use prelude::*;
-
-const SCALE: usize = 3;
 
 struct State {
     world: World,
@@ -66,9 +66,13 @@ impl State {
 
         world.extend(scaffold.border_entities());
 
+        let mut scoreboard_rect_iter = scaffold.score_rects();
         world.push((MenuItem { rank: 0 }, DisplayText("Game Over!".to_string())));
         world.push((
             MenuItem { rank: 1 },
+            ScoreboardItem {
+                rect: scoreboard_rect_iter.next().unwrap(),
+            },
             DisplayText("Lines cleared:".to_string()),
             Metric::LinesCleared,
         ));
@@ -88,6 +92,8 @@ impl GameState for State {
         ctx.set_active_console(0);
         ctx.cls();
         ctx.set_active_console(1);
+        ctx.cls();
+        ctx.set_active_console(2);
         ctx.cls_bg((0, 0, 0, 0));
 
         self.resources.insert(ctx.key);
@@ -115,7 +121,16 @@ fn main() -> BError {
         )
         .with_font("terminal8x8.png", 8, 8)
         .with_simple_console(SCREEN_WIDTH, SCREEN_HEIGHT, "terminal8x8.png")
-        .with_simple_console(2 * SCREEN_WIDTH, 2 * SCREEN_HEIGHT, "terminal8x8.png")
+        .with_simple_console_no_bg(
+            TEXT_SCALE * SCREEN_WIDTH,
+            TEXT_SCALE * SCREEN_HEIGHT,
+            "terminal8x8.png",
+        )
+        .with_simple_console(
+            TEXT_SCALE * SCREEN_WIDTH,
+            TEXT_SCALE * SCREEN_HEIGHT,
+            "terminal8x8.png",
+        )
         .build()?;
     main_loop(ctx, State::new())
 }
