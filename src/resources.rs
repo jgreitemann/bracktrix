@@ -10,6 +10,7 @@ pub struct Screen(pub Rect);
 
 pub struct Difficulty {
     pub gravity_tick_speed: usize,
+    pub quick_drop: bool,
 }
 
 pub struct BlockSpawnPoints {

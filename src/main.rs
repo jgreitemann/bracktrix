@@ -48,6 +48,7 @@ impl State {
         resources.insert(RandomNumberGenerator::new());
         resources.insert(Difficulty {
             gravity_tick_speed: 8,
+            quick_drop: false,
         });
 
         let scaffold = Scaffold {
