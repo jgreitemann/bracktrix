@@ -78,46 +78,8 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         ctx.cls();
 
-        /*
-        if self.animation_index == 0 {
-            let mut updated = self.active_block.clone().with_keys_applied(ctx);
-
-            if !self.block_fits_canvas(&updated) {
-                // roll back
-                updated = self.active_block.clone();
-            }
-
-            updated = updated.with_gravity_applied(self.frame_index);
-            self.active_block = if self.block_fits_canvas(&updated) {
-                updated
-            } else {
-                self.canvas.bake(self.active_block.pixels());
-                let next = Block::new(self.preview_block.shape(), self.canvas.spawn_point());
-                self.preview_block =
-                    Block::new(BlockShape::random(), self.scaffold.preview_origin());
-                next
-            };
-        }
-
-        let full_rows = self.canvas.full_rows();
-
-        if self.animation_index == 0 && !full_rows.is_empty() {
-            self.animation_index = ANIMATION_DURATION;
-        }
-
-        if self.animation_index > 0 {
-            self.animation_index -= 1;
-            if self.animation_index == 0 {
-                self.canvas.clear_rows(full_rows.into_iter());
-            }
-        }
-
-         */
-
         self.resources.insert(ctx.key);
 
-        // self.canvas
-        //     .render(self.scaffold.canvas_viewport(ctx), self.animation_index);
         self.systems.execute(&mut self.world, &mut self.resources);
         render_draw_buffer(ctx).expect("Render error");
     }

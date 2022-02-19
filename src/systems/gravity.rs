@@ -18,6 +18,7 @@ pub fn gravity(
                 .filter(component::<Active>())
                 .for_each(world, |&entity| {
                     cmd.remove_component::<Active>(entity);
+                    cmd.add_component(entity, Settled {});
                 })
         }
     }
