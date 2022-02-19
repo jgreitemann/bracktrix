@@ -2,43 +2,42 @@ use crate::prelude::*;
 use legion::systems::CommandBuffer;
 
 #[system]
+#[read_component(Active)]
+#[read_component(Preview)]
 pub fn block_spawning(
+    world: &SubWorld,
     cmd: &mut CommandBuffer,
-    #[resource] store: &mut BlockEntityStore,
     #[resource] spawn_points: &BlockSpawnPoints,
 ) {
-    if store.preview.is_none() {
+    if <&Preview>::query().iter(world).next().is_none() {
         let block = BlockShape::random();
         let spawn = spawn_points.preview_block_spawn;
         let offset = block.rotation_offset();
-        store.preview = Some(
-            <[Entity; 4]>::try_from(cmd.extend(block.pixels().map(move |pix| {
-                (
-                    Preview {},
-                    Position(pix.position + spawn),
-                    Pivot(pix.position * 2 - offset),
-                    PixelRender {
-                        colors: ColorPair::new(pix.color, BLACK),
-                        glyph: to_cp437(pix.glyph),
-                    },
-                )
-            })))
-            .unwrap(),
-        );
+        cmd.extend(block.pixels().map(move |pix| {
+            (
+                Preview {},
+                Position(pix.position + spawn),
+                Pivot(pix.position * 2 - offset),
+                PixelRender {
+                    colors: ColorPair::new(pix.color, BLACK),
+                    glyph: to_cp437(pix.glyph),
+                },
+            )
+        }));
     }
 
-    if store.active.is_none() {
-        if let Some(preview_entities) = std::mem::replace(&mut store.preview, None) {
-            for entity in preview_entities {
+    if <&Active>::query().iter(world).next().is_none() {
+        <Entity>::query()
+            .filter(component::<Preview>())
+            .for_each(world, |&entity| {
                 cmd.remove_component::<Preview>(entity);
                 cmd.add_component(entity, Active {});
-            }
-            let translation =
-                Translation(spawn_points.active_block_spawn - spawn_points.preview_block_spawn);
-            cmd.exec_mut(move |world, _| {
-                super::collision::transform_active_entities(world, &translation);
             });
-            store.active = Some(preview_entities);
-        }
+
+        let translation =
+            Translation(spawn_points.active_block_spawn - spawn_points.preview_block_spawn);
+        cmd.exec_mut(move |world, _| {
+            super::collision::transform_active_entities(world, &translation);
+        });
     }
 }

@@ -58,7 +58,6 @@ impl State {
         resources.insert(Difficulty {
             gravity_tick_speed: 6,
         });
-        resources.insert(BlockEntityStore::new());
         resources.insert(BlockSpawnPoints {
             active_block_spawn: scaffold.spawn_point(),
             preview_block_spawn: scaffold.preview_origin(),
