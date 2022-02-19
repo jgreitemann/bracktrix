@@ -2,8 +2,6 @@ use crate::prelude::*;
 use bracket_lib::prelude::*;
 use std::collections::HashSet;
 
-pub type Color = (u8, u8, u8);
-
 pub fn to_screen(position: &Point, rect: &Rect) -> Option<Point> {
     let screen_point = *position + Point::new(rect.x1, rect.y1);
     if rect.point_in_rect(screen_point) {
@@ -68,12 +66,6 @@ impl Transform for Rotation {
             Deg270 => Deg90,
         }
     }
-}
-
-pub struct Pixel {
-    pub position: Point,
-    pub color: Color,
-    pub glyph: char,
 }
 
 pub fn grow_rect(rect: &Rect, amount: i32) -> Rect {

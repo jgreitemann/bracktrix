@@ -13,5 +13,5 @@ pub fn line_detection(world: &SubWorld, cmd: &mut CommandBuffer) {
         .into_values()
         .filter(|line| line.len() >= CANVAS_WIDTH)
         .flatten()
-        .for_each(|&entity| cmd.add_component(entity, Flagged::new()));
+        .for_each(|&entity| cmd.add_component(entity, Flagged::default()));
 }

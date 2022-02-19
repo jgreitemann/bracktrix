@@ -10,20 +10,7 @@ pub fn block_spawning(
     #[resource] rng: &mut RandomNumberGenerator,
 ) {
     if <&Preview>::query().iter(world).next().is_none() {
-        let block = BlockShape::random(rng);
-        let spawn = spawn_points.preview_block_spawn;
-        let offset = block.rotation_offset();
-        cmd.extend(block.pixels().map(move |pix| {
-            (
-                Preview {},
-                Position(pix.position + spawn),
-                Pivot(pix.position * 2 - offset),
-                PixelRender {
-                    colors: ColorPair::new(pix.color, BLACK),
-                    glyph: to_cp437(pix.glyph),
-                },
-            )
-        }));
+        cmd.extend(Block::random(rng).components::<Preview>(&spawn_points.preview_block_spawn));
     }
 
     if <&Active>::query().iter(world).next().is_none() {
