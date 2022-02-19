@@ -65,7 +65,12 @@ impl State {
 
         world.extend(scaffold.border_entities());
 
-        world.push((DisplayText("Game Over!".to_string()),));
+        world.push((MenuItem { rank: 0 }, DisplayText("Game Over!".to_string())));
+        world.push((
+            MenuItem { rank: 1 },
+            DisplayText("Lines cleared:".to_string()),
+            Metric::LinesCleared,
+        ));
 
         Self {
             world,
