@@ -9,11 +9,9 @@ pub fn pixel_render(world: &SubWorld, #[resource] Screen(screen_rect): &Screen) 
 
     <(&Position, &PixelRender)>::query()
         .iter(world)
-        .filter_map(|(Position(pos), render)| {
-            to_screen(&pos, &screen_rect).map(|screen_point| (screen_point, render))
-        })
-        .for_each(|(screen_point, &PixelRender { colors, glyph })| {
-            draw_batch.set(screen_point, colors, glyph);
+        .filter(|(&Position(pt), _)| screen_rect.point_in_rect(pt))
+        .for_each(|(&Position(pt), &PixelRender { colors, glyph })| {
+            draw_batch.set(pt, colors, glyph);
         });
 
     draw_batch.submit(0).expect("Batch error");
