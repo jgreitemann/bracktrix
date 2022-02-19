@@ -11,6 +11,7 @@ mod test_utils;
 
 mod prelude {
     pub use bracket_lib::prelude::*;
+    pub use legion::systems::CommandBuffer;
     pub use legion::world::SubWorld;
     pub use legion::*;
 
@@ -23,9 +24,6 @@ mod prelude {
     pub use crate::viewport::*;
 
     pub const ANIMATION_DURATION: usize = 16;
-    pub const BLOCK_GLYPHS: [char; 16] = [
-        '█', '▓', '▒', '░', '▒', '▓', '▒', '░', '▒', '▓', '▒', '░', '▒', '▓', '▒', '░',
-    ];
 }
 
 use prelude::*;

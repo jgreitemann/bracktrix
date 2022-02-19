@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use legion::systems::CommandBuffer;
 
 #[system]
 #[write_component(Position)]

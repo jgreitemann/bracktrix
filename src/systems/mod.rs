@@ -1,6 +1,7 @@
 mod block_spawning;
 mod collision;
 mod gravity;
+mod line_deletion;
 mod line_detection;
 mod pixel_renderer;
 mod player_input;
@@ -14,5 +15,6 @@ pub fn build_schedule() -> Schedule {
         .add_system(gravity::gravity_system(0))
         .add_system(block_spawning::block_spawning_system())
         .add_system(line_detection::line_detection_system())
+        .add_system(line_deletion::line_deletion_system())
         .build()
 }
