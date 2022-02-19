@@ -12,10 +12,7 @@ pub fn scoreboard_render(world: &SubWorld, #[resource] scoring: &Scoring) {
         world,
         |(ScoreboardItem { rect }, DisplayText(text), &metric)| {
             draw_batch.print(Point::new(rect.x1, rect.y1), text);
-            draw_batch.print_right(
-                Point::new(rect.x2, rect.y2),
-                format!("{}", scoring.get(metric)),
-            );
+            draw_batch.print_right(Point::new(rect.x2, rect.y2), scoring.get(metric));
         },
     );
 

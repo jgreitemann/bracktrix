@@ -83,6 +83,13 @@ impl State {
             DisplayText("# Bracktrixes:".to_string()),
             Metric::NumberOfBracktrixes,
         ));
+        world.push((
+            ScoreboardItem {
+                rect: scoreboard_rect_iter.next().unwrap(),
+            },
+            DisplayText("Time elapsed:".to_string()),
+            Metric::TimeElapsed,
+        ));
 
         Self {
             world,

@@ -14,4 +14,5 @@ pub struct DisplayText(pub String);
 pub enum Metric {
     LinesCleared,
     NumberOfBracktrixes,
+    TimeElapsed,
 }
