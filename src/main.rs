@@ -1,69 +1,71 @@
 mod block;
-mod canvas;
+mod components;
 mod graphics;
+mod resources;
 mod scaffold;
-mod viewport;
+mod systems;
 
 #[cfg(test)]
 mod test_utils;
 
 mod prelude {
-    pub use crate::block::*;
-    pub use crate::canvas::*;
-    pub use crate::graphics::*;
-    pub use crate::scaffold::*;
-    pub use crate::viewport::*;
     pub use bracket_lib::prelude::*;
+    pub use legion::systems::CommandBuffer;
+    pub use legion::world::SubWorld;
+    pub use legion::*;
 
-    pub const ANIMATION_DURATION: usize = 16;
-    pub const BLOCK_GLYPHS: [char; 16] = [
-        '█', '▓', '▒', '░', '▒', '▓', '▒', '░', '▒', '▓', '▒', '░', '▒', '▓', '▒', '░',
-    ];
+    pub use crate::block::*;
+    pub use crate::components::*;
+    pub use crate::graphics::*;
+    pub use crate::resources::*;
+    pub use crate::scaffold::*;
+    pub use crate::systems::*;
+
+    pub const SCREEN_WIDTH: usize = 23;
+    pub const SCREEN_HEIGHT: usize = 25;
+    pub const CANVAS_WIDTH: usize = 12;
+    pub const CANVAS_HEIGHT: usize = 21;
 }
 
 use prelude::*;
 
-const SCREEN_WIDTH: usize = 23;
-const SCREEN_HEIGHT: usize = 25;
-const CANVAS_WIDTH: usize = 12;
-const CANVAS_HEIGHT: usize = 21;
 const SCALE: usize = 3;
 
 struct State {
-    frame_index: usize,
-    animation_index: usize,
-    scaffold: Scaffold,
-    canvas: Canvas,
-    active_block: Block,
-    preview_block: Block,
+    world: World,
+    resources: Resources,
+    systems: Schedule,
 }
 
 impl State {
     fn new() -> Self {
+        let mut world = World::default();
+        let mut resources = Resources::default();
+
+        resources.insert(RandomNumberGenerator::new());
+        resources.insert(Difficulty {
+            gravity_tick_speed: 4,
+        });
+
         let scaffold = Scaffold {
             screen_width: SCREEN_WIDTH,
             screen_height: SCREEN_HEIGHT,
             canvas_width: CANVAS_WIDTH,
             canvas_height: CANVAS_HEIGHT,
         };
+        resources.insert(Screen(scaffold.screen_rect()));
+        resources.insert(BlockSpawnPoints {
+            active_block_spawn: scaffold.spawn_point(),
+            preview_block_spawn: scaffold.preview_origin(),
+        });
 
-        let canvas = Canvas::new(CANVAS_WIDTH, CANVAS_HEIGHT);
-        let active_block = Block::new(BlockShape::random(), canvas.spawn_point());
-
-        let preview_block = Block::new(BlockShape::random(), scaffold.preview_origin());
+        world.extend(scaffold.border_entities());
 
         Self {
-            frame_index: 0,
-            animation_index: 0,
-            scaffold,
-            canvas,
-            active_block,
-            preview_block,
+            world,
+            resources,
+            systems: build_schedule(),
         }
-    }
-
-    fn block_fits_canvas(&self, block: &Block) -> bool {
-        block.points().all(|p| self.canvas.is_empty(&p))
     }
 }
 
@@ -71,47 +73,10 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         ctx.cls();
 
-        if self.animation_index == 0 {
-            let mut updated = self.active_block.clone().with_keys_applied(ctx);
+        self.resources.insert(ctx.key);
 
-            if !self.block_fits_canvas(&updated) {
-                // roll back
-                updated = self.active_block.clone();
-            }
-
-            updated = updated.with_gravity_applied(self.frame_index);
-            self.active_block = if self.block_fits_canvas(&updated) {
-                updated
-            } else {
-                self.canvas.bake(self.active_block.pixels());
-                let next = Block::new(self.preview_block.shape(), self.canvas.spawn_point());
-                self.preview_block =
-                    Block::new(BlockShape::random(), self.scaffold.preview_origin());
-                next
-            };
-        }
-
-        let full_rows = self.canvas.full_rows();
-
-        if self.animation_index == 0 && !full_rows.is_empty() {
-            self.animation_index = ANIMATION_DURATION;
-        }
-
-        if self.animation_index > 0 {
-            self.animation_index -= 1;
-            if self.animation_index == 0 {
-                self.canvas.clear_rows(full_rows.into_iter());
-            }
-        }
-
-        self.scaffold.render(ctx);
-        self.canvas
-            .render(self.scaffold.canvas_viewport(ctx), self.animation_index);
-        self.active_block.render(self.scaffold.canvas_viewport(ctx));
-        self.preview_block
-            .render(self.scaffold.preview_viewport(ctx));
-
-        self.frame_index += 1;
+        self.systems.execute(&mut self.world, &mut self.resources);
+        render_draw_buffer(ctx).expect("Render error");
     }
 }
 

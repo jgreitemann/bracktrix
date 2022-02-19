@@ -1,12 +1,71 @@
+use crate::prelude::*;
 use bracket_lib::prelude::*;
 use std::collections::HashSet;
 
-pub type Color = (u8, u8, u8);
+pub fn to_screen(position: &Point, rect: &Rect) -> Option<Point> {
+    let screen_point = *position + Point::new(rect.x1, rect.y1);
+    if rect.point_in_rect(screen_point) {
+        Some(screen_point)
+    } else {
+        None
+    }
+}
 
-pub struct Pixel {
-    pub position: Point,
-    pub color: Color,
-    pub glyph: char,
+pub trait Transform {
+    fn apply_to(&self, pos: &mut Position, pivot: &mut Pivot);
+    fn inv(&self) -> Self;
+}
+
+pub struct Translation(pub Point);
+
+impl Transform for Translation {
+    fn apply_to(&self, Position(point): &mut Position, _: &mut Pivot) {
+        let &Translation(delta) = self;
+        *point += delta;
+    }
+
+    fn inv(&self) -> Self {
+        Translation(self.0 * (-1))
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
+#[allow(dead_code)]
+pub enum Rotation {
+    Deg0,
+    Deg90,
+    Deg180,
+    Deg270,
+}
+
+impl Rotation {
+    fn applied_to(&self, p: &Point) -> Point {
+        use Rotation::*;
+        match self {
+            Deg0 => p.clone(),
+            Deg90 => Point::new(-p.y, p.x),
+            Deg180 => Point::new(-p.x, -p.y),
+            Deg270 => Point::new(p.y, -p.x),
+        }
+    }
+}
+
+impl Transform for Rotation {
+    fn apply_to(&self, Position(pos): &mut Position, Pivot(pivot): &mut Pivot) {
+        let new_pivot = self.applied_to(pivot);
+        *pos += (new_pivot - *pivot) / 2;
+        *pivot = new_pivot;
+    }
+
+    fn inv(&self) -> Self {
+        use Rotation::*;
+        match self {
+            Deg0 => Deg0,
+            Deg90 => Deg270,
+            Deg180 => Deg180,
+            Deg270 => Deg90,
+        }
+    }
 }
 
 pub fn grow_rect(rect: &Rect, amount: i32) -> Rect {
