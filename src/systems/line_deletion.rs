@@ -14,12 +14,12 @@ pub fn line_deletion(world: &mut SubWorld, cmd: &mut CommandBuffer) {
     let deleted_lines: HashSet<_> = <(Entity, &mut Flagged, &mut PixelRender, &Position)>::query()
         .iter_mut(world)
         .filter_map(|(&entity, flag, render, Position(Point { y, .. }))| {
-            flag.frames_till_death += 1;
-            if flag.frames_till_death == ANIMATION_GLYPHS.len() {
+            flag.animation_frame += 1;
+            if flag.animation_frame == ANIMATION_GLYPHS.len() {
                 cmd.remove(entity);
                 Some(*y)
             } else {
-                render.glyph = to_cp437(ANIMATION_GLYPHS[flag.frames_till_death]);
+                render.glyph = to_cp437(ANIMATION_GLYPHS[flag.animation_frame]);
                 None
             }
         })

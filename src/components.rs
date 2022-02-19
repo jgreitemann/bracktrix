@@ -23,5 +23,5 @@ pub struct PixelRender {
 
 #[derive(Default)]
 pub struct Flagged {
-    pub frames_till_death: usize,
+    pub animation_frame: usize,
 }
