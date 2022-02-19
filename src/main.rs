@@ -64,6 +64,8 @@ impl State {
 
         world.extend(scaffold.border_entities());
 
+        world.push((DisplayText("Game Over!".to_string()),));
+
         Self {
             world,
             resources,
