@@ -13,6 +13,20 @@ pub struct Difficulty {
     pub quick_drop: bool,
 }
 
+#[derive(Default)]
+pub struct Scoring {
+    pub lines_cleared: usize,
+}
+
+impl Scoring {
+    pub fn get(&self, metric: Metric) -> usize {
+        use Metric::*;
+        match metric {
+            LinesCleared => self.lines_cleared,
+        }
+    }
+}
+
 pub struct BlockSpawnPoints {
     pub active_block_spawn: Point,
     pub preview_block_spawn: Point,

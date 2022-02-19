@@ -4,6 +4,7 @@ pub struct MenuItem {
 
 pub struct DisplayText(pub String);
 
+#[derive(Copy, Clone)]
 pub enum Metric {
     LinesCleared,
 }

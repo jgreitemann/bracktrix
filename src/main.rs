@@ -50,6 +50,7 @@ impl State {
             gravity_tick_speed: 8,
             quick_drop: false,
         });
+        resources.insert(Scoring::default());
 
         let scaffold = Scaffold {
             screen_width: SCREEN_WIDTH,
