@@ -7,7 +7,7 @@ use crate::prelude::*;
 pub fn player_input(
     world: &mut SubWorld,
     #[resource] key: &Option<VirtualKeyCode>,
-    #[resource] difficulty: &mut Difficulty,
+    #[resource] scoring: &mut Scoring,
 ) {
     if let &Some(key) = key {
         use super::collision::*;
@@ -26,7 +26,7 @@ pub fn player_input(
                 apply_if_collision_free(world, Rotation::Deg90);
             }
             Space => {
-                difficulty.hard_drop = true;
+                scoring.hard_drop();
             }
             _ => {}
         };

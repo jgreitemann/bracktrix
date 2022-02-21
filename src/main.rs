@@ -3,6 +3,7 @@ mod components;
 mod graphics;
 mod resources;
 mod scaffold;
+mod scoring;
 mod systems;
 
 #[cfg(test)]
@@ -19,6 +20,7 @@ mod prelude {
     pub use crate::graphics::*;
     pub use crate::resources::*;
     pub use crate::scaffold::*;
+    pub use crate::scoring::*;
     pub use crate::systems::*;
 
     pub const SCREEN_WIDTH: usize = 23;
@@ -46,10 +48,6 @@ impl State {
 
         resources.insert(GameMode::Play);
         resources.insert(RandomNumberGenerator::new());
-        resources.insert(Difficulty {
-            gravity_tick_speed: 8,
-            hard_drop: false,
-        });
         resources.insert(Scoring::default());
 
         let scaffold = Scaffold {
@@ -70,6 +68,21 @@ impl State {
         world.push((MenuItem { rank: 0 }, DisplayText("Game Over!".to_string())));
         world.push((
             MenuItem { rank: 1 },
+            ScoreboardItem {
+                rect: scoreboard_rect_iter.next().unwrap(),
+            },
+            DisplayText("Level:".to_string()),
+            Metric::Level,
+        ));
+        world.push((
+            ScoreboardItem {
+                rect: scoreboard_rect_iter.next().unwrap(),
+            },
+            DisplayText("Level up:".to_string()),
+            Metric::LevelUpFraction,
+        ));
+        world.push((
+            MenuItem { rank: 2 },
             ScoreboardItem {
                 rect: scoreboard_rect_iter.next().unwrap(),
             },
@@ -96,6 +109,13 @@ impl State {
             },
             DisplayText("Time elapsed:".to_string()),
             Metric::TimeElapsed,
+        ));
+        world.push((
+            ScoreboardItem {
+                rect: scoreboard_rect_iter.next().unwrap(),
+            },
+            DisplayText("Blocks placed:".to_string()),
+            Metric::BlocksPlaced,
         ));
 
         Self {

@@ -12,8 +12,11 @@ pub struct DisplayText(pub String);
 
 #[derive(Copy, Clone)]
 pub enum Metric {
+    Level,
+    LevelUpFraction,
     Score,
     LinesCleared,
     NumberOfBracktrixes,
     TimeElapsed,
+    BlocksPlaced,
 }
