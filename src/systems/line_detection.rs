@@ -18,10 +18,7 @@ pub fn line_detection(
         .filter(|line| line.len() >= CANVAS_WIDTH)
         .collect_vec();
 
-    scoring.lines_cleared += completed_lines.len();
-    if completed_lines.len() == 4 {
-        scoring.bracktrixes += 1;
-    }
+    scoring.score_lines_cleared(completed_lines.len());
 
     completed_lines
         .into_iter()

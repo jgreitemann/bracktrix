@@ -26,7 +26,7 @@ pub fn player_input(
                 apply_if_collision_free(world, Rotation::Deg90);
             }
             Space => {
-                difficulty.quick_drop = true;
+                difficulty.hard_drop = true;
             }
             _ => {}
         };

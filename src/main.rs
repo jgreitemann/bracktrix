@@ -48,7 +48,7 @@ impl State {
         resources.insert(RandomNumberGenerator::new());
         resources.insert(Difficulty {
             gravity_tick_speed: 8,
-            quick_drop: false,
+            hard_drop: false,
         });
         resources.insert(Scoring::default());
 
@@ -70,6 +70,13 @@ impl State {
         world.push((MenuItem { rank: 0 }, DisplayText("Game Over!".to_string())));
         world.push((
             MenuItem { rank: 1 },
+            ScoreboardItem {
+                rect: scoreboard_rect_iter.next().unwrap(),
+            },
+            DisplayText("Score:".to_string()),
+            Metric::Score,
+        ));
+        world.push((
             ScoreboardItem {
                 rect: scoreboard_rect_iter.next().unwrap(),
             },
