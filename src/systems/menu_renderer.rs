@@ -8,17 +8,17 @@ const V_PADDING: usize = 2;
 #[system]
 #[read_component(MenuItem)]
 #[read_component(DisplayText)]
-#[read_component(Metric)]
+#[read_component(Score)]
 pub fn menu_render(world: &SubWorld, #[resource] scoring: &Scoring) {
     let mut draw_batch = DrawBatch::new();
     draw_batch.target(2);
     draw_batch.cls_color((0, 0, 0, 200));
 
-    let entries = <(&MenuItem, &DisplayText, Option<&Metric>)>::query()
+    let entries = <(&MenuItem, &DisplayText, Option<&Score>)>::query()
         .iter(world)
         .sorted_by_key(|(MenuItem { rank }, ..)| rank)
         .map(|(_, DisplayText(text), stat)| match stat {
-            Some(&metric) => format!("{} {}", text, scoring.get(metric)),
+            Some(&Score { metric, .. }) => format!("{} {}", text, scoring.get_text(metric)),
             None => text.clone(),
         })
         .collect_vec();

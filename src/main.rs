@@ -72,14 +72,20 @@ impl State {
                 rect: scoreboard_rect_iter.next().unwrap(),
             },
             DisplayText("Level:".to_string()),
-            Metric::Level,
+            Score {
+                metric: Metric::Level,
+                style: ScoreStyle::Text,
+            },
         ));
         world.push((
             ScoreboardItem {
                 rect: scoreboard_rect_iter.next().unwrap(),
             },
             DisplayText("Level up:".to_string()),
-            Metric::LevelUpFraction,
+            Score {
+                metric: Metric::LevelUpFraction,
+                style: ScoreStyle::ProgressBar,
+            },
         ));
         world.push((
             MenuItem { rank: 2 },
@@ -87,35 +93,50 @@ impl State {
                 rect: scoreboard_rect_iter.next().unwrap(),
             },
             DisplayText("Score:".to_string()),
-            Metric::Score,
+            Score {
+                metric: Metric::Score,
+                style: ScoreStyle::Text,
+            },
         ));
         world.push((
             ScoreboardItem {
                 rect: scoreboard_rect_iter.next().unwrap(),
             },
             DisplayText("Lines cleared:".to_string()),
-            Metric::LinesCleared,
+            Score {
+                metric: Metric::LinesCleared,
+                style: ScoreStyle::Text,
+            },
         ));
         world.push((
             ScoreboardItem {
                 rect: scoreboard_rect_iter.next().unwrap(),
             },
             DisplayText("# Bracktrixes:".to_string()),
-            Metric::NumberOfBracktrixes,
+            Score {
+                metric: Metric::NumberOfBracktrixes,
+                style: ScoreStyle::Text,
+            },
         ));
         world.push((
             ScoreboardItem {
                 rect: scoreboard_rect_iter.next().unwrap(),
             },
             DisplayText("Time elapsed:".to_string()),
-            Metric::TimeElapsed,
+            Score {
+                metric: Metric::TimeElapsed,
+                style: ScoreStyle::Text,
+            },
         ));
         world.push((
             ScoreboardItem {
                 rect: scoreboard_rect_iter.next().unwrap(),
             },
             DisplayText("Blocks placed:".to_string()),
-            Metric::BlocksPlaced,
+            Score {
+                metric: Metric::BlocksPlaced,
+                style: ScoreStyle::Text,
+            },
         ));
 
         Self {

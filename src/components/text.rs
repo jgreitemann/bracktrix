@@ -11,12 +11,12 @@ pub struct ScoreboardItem {
 pub struct DisplayText(pub String);
 
 #[derive(Copy, Clone)]
-pub enum Metric {
-    Level,
-    LevelUpFraction,
-    Score,
-    LinesCleared,
-    NumberOfBracktrixes,
-    TimeElapsed,
-    BlocksPlaced,
+pub enum ScoreStyle {
+    Text,
+    ProgressBar,
+}
+
+pub struct Score {
+    pub metric: Metric,
+    pub style: ScoreStyle,
 }

@@ -1,4 +1,13 @@
-use crate::prelude::*;
+#[derive(Copy, Clone)]
+pub enum Metric {
+    Level,
+    LevelUpFraction,
+    Score,
+    LinesCleared,
+    NumberOfBracktrixes,
+    TimeElapsed,
+    BlocksPlaced,
+}
 
 pub struct Scoring {
     level: usize,
@@ -27,7 +36,7 @@ impl Default for Scoring {
 }
 
 impl Scoring {
-    pub fn get(&self, metric: Metric) -> String {
+    pub fn get_text(&self, metric: Metric) -> String {
         use Metric::*;
         match metric {
             Level => self.level.to_string(),
@@ -40,6 +49,14 @@ impl Scoring {
                 format!("{}:{:02}", secs / 60, secs % 60)
             }
             BlocksPlaced => self.blocks_placed.to_string(),
+        }
+    }
+
+    pub fn get_fraction(&self, metric: Metric) -> f32 {
+        use Metric::*;
+        match metric {
+            LevelUpFraction => self.level_up_fraction(),
+            _ => 0f32,
         }
     }
 
