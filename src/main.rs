@@ -11,6 +11,7 @@ mod test_utils;
 
 mod prelude {
     pub use bracket_lib::prelude::*;
+    pub use gilrs::*;
     pub use legion::systems::CommandBuffer;
     pub use legion::world::SubWorld;
     pub use legion::*;
@@ -49,6 +50,7 @@ impl State {
         resources.insert(GameMode::Play);
         resources.insert(RandomNumberGenerator::new());
         resources.insert(Scoring::default());
+        resources.insert(Gilrs::new().unwrap());
 
         let scaffold = Scaffold {
             screen_width: SCREEN_WIDTH,
@@ -159,6 +161,7 @@ impl GameState for State {
         ctx.cls_bg((0, 0, 0, 0));
 
         self.resources.insert(ctx.key);
+        self.resources.insert(GamepadKey(None));
 
         let mode = *self.resources.get::<GameMode>().unwrap();
         self.base_systems

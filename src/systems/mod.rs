@@ -1,5 +1,6 @@
 mod block_spawning;
 mod collision;
+mod gamepad_input;
 mod gravity;
 mod line_deletion;
 mod line_detection;
@@ -19,6 +20,7 @@ pub fn build_base_schedule() -> Schedule {
 
 pub fn build_play_schedule() -> Schedule {
     Schedule::builder()
+        .add_system(gamepad_input::gamepad_input_system())
         .add_system(player_input::player_input_system())
         .add_system(gravity::gravity_system(0))
         .add_system(block_spawning::block_spawning_system())

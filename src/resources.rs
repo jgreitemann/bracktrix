@@ -12,3 +12,5 @@ pub struct BlockSpawnPoints {
     pub active_block_spawn: Point,
     pub preview_block_spawn: Point,
 }
+
+pub struct GamepadKey(pub Option<VirtualKeyCode>);

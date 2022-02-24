@@ -7,9 +7,10 @@ use crate::prelude::*;
 pub fn player_input(
     world: &mut SubWorld,
     #[resource] key: &Option<VirtualKeyCode>,
+    #[resource] GamepadKey(gamepad_key): &GamepadKey,
     #[resource] scoring: &mut Scoring,
 ) {
-    if let &Some(key) = key {
+    if let Some(key) = key.or(*gamepad_key) {
         use super::collision::*;
         use VirtualKeyCode::*;
         match key {
