@@ -51,6 +51,7 @@ impl State {
         resources.insert(RandomNumberGenerator::new());
         resources.insert(Scoring::default());
         resources.insert(Gilrs::new().unwrap());
+        resources.insert(None as Option<GamepadKey>);
 
         let scaffold = Scaffold {
             screen_width: SCREEN_WIDTH,
@@ -161,7 +162,6 @@ impl GameState for State {
         ctx.cls_bg((0, 0, 0, 0));
 
         self.resources.insert(ctx.key);
-        self.resources.insert(GamepadKey(None));
 
         let mode = *self.resources.get::<GameMode>().unwrap();
         self.base_systems

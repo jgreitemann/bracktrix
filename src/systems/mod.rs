@@ -20,7 +20,7 @@ pub fn build_base_schedule() -> Schedule {
 
 pub fn build_play_schedule() -> Schedule {
     Schedule::builder()
-        .add_system(gamepad_input::gamepad_input_system())
+        .add_system(gamepad_input::gamepad_input_system(None))
         .add_system(player_input::player_input_system())
         .add_system(gravity::gravity_system(0))
         .add_system(block_spawning::block_spawning_system())
