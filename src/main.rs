@@ -11,8 +11,7 @@ mod test_utils;
 
 mod prelude {
     pub use bracket_lib::prelude::*;
-    pub use gilrs::*;
-    pub use legion::systems::CommandBuffer;
+    pub use legion::systems::{Builder, CommandBuffer};
     pub use legion::world::SubWorld;
     pub use legion::*;
 
@@ -42,6 +41,15 @@ struct State {
     menu_systems: Schedule,
 }
 
+#[cfg(feature = "gamepad")]
+fn insert_gamepad_resources(resources: &mut Resources) {
+    use gilrs::Gilrs;
+    resources.insert(Gilrs::new().unwrap());
+}
+
+#[cfg(not(feature = "gamepad"))]
+fn insert_gamepad_resources(_: &mut Resources) {}
+
 impl State {
     fn new() -> Self {
         let mut world = World::default();
@@ -50,8 +58,8 @@ impl State {
         resources.insert(GameMode::Play);
         resources.insert(RandomNumberGenerator::new());
         resources.insert(Scoring::default());
-        resources.insert(Gilrs::new().unwrap());
         resources.insert(None as Option<GamepadKey>);
+        insert_gamepad_resources(&mut resources);
 
         let scaffold = Scaffold {
             screen_width: SCREEN_WIDTH,

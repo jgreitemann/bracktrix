@@ -20,6 +20,7 @@ pub struct GamepadKey {
 }
 
 impl GamepadKey {
+    #[cfg(feature = "gamepad")]
     pub fn new(key: VirtualKeyCode) -> Self {
         GamepadKey {
             key,
@@ -28,6 +29,7 @@ impl GamepadKey {
         }
     }
 
+    #[cfg(feature = "gamepad")]
     pub fn matches(&self, other: VirtualKeyCode) -> bool {
         self.key == other
     }
