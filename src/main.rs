@@ -1,6 +1,7 @@
 mod block;
 mod components;
 mod graphics;
+mod input;
 mod resources;
 mod scaffold;
 mod scoring;
@@ -18,6 +19,7 @@ mod prelude {
     pub use crate::block::*;
     pub use crate::components::*;
     pub use crate::graphics::*;
+    pub use crate::input::*;
     pub use crate::resources::*;
     pub use crate::scaffold::*;
     pub use crate::scoring::*;
@@ -35,20 +37,12 @@ use prelude::*;
 
 struct State {
     world: World,
+    input_source: GamepadInputSource,
     resources: Resources,
     base_systems: Schedule,
     play_systems: Schedule,
     menu_systems: Schedule,
 }
-
-#[cfg(feature = "gamepad")]
-fn insert_gamepad_resources(resources: &mut Resources) {
-    use gilrs::Gilrs;
-    resources.insert(Gilrs::new().unwrap());
-}
-
-#[cfg(not(feature = "gamepad"))]
-fn insert_gamepad_resources(_: &mut Resources) {}
 
 impl State {
     fn new() -> Self {
@@ -58,8 +52,6 @@ impl State {
         resources.insert(GameMode::Play);
         resources.insert(RandomNumberGenerator::new());
         resources.insert(Scoring::default());
-        resources.insert(None as Option<GamepadKey>);
-        insert_gamepad_resources(&mut resources);
 
         let scaffold = Scaffold {
             screen_width: SCREEN_WIDTH,
@@ -152,6 +144,7 @@ impl State {
 
         Self {
             world,
+            input_source: GamepadInputSource::new(),
             resources,
             base_systems: build_base_schedule(),
             play_systems: build_play_schedule(),
@@ -169,7 +162,7 @@ impl GameState for State {
         ctx.set_active_console(2);
         ctx.cls_bg((0, 0, 0, 0));
 
-        self.resources.insert(ctx.key);
+        self.resources.insert(self.input_source.read());
 
         let mode = *self.resources.get::<GameMode>().unwrap();
         self.base_systems

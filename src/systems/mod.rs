@@ -8,9 +8,6 @@ mod pixel_renderer;
 mod player_input;
 mod scoreboard_renderer;
 
-#[cfg(feature = "gamepad")]
-mod gamepad_input;
-
 use crate::prelude::*;
 
 pub fn build_base_schedule() -> Schedule {
@@ -20,30 +17,9 @@ pub fn build_base_schedule() -> Schedule {
         .build()
 }
 
-trait GamepadSupport {
-    fn add_gamepad_support_system(&mut self) -> &mut Self;
-}
-
-#[cfg(not(feature = "gamepad"))]
-impl GamepadSupport for Builder {
-    fn add_gamepad_support_system(&mut self) -> &mut Self {
-        self
-    }
-}
-
-#[cfg(feature = "gamepad")]
-impl GamepadSupport for Builder {
-    fn add_gamepad_support_system(&mut self) -> &mut Self {
-        self.add_system(gamepad_input::gamepad_input_system(None))
-    }
-}
-
 pub fn build_play_schedule() -> Schedule {
-    let mut builder = Schedule::builder();
-    if cfg!(feature = "gamepad") {}
-    builder
-        .add_gamepad_support_system()
-        .add_system(player_input::player_input_system())
+    Schedule::builder()
+        .add_system(player_input::player_input_system(GameInputState::new()))
         .add_system(gravity::gravity_system(0))
         .add_system(block_spawning::block_spawning_system())
         .add_system(line_detection::line_detection_system())

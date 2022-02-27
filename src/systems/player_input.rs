@@ -6,27 +6,29 @@ use crate::prelude::*;
 #[read_component(Active)]
 pub fn player_input(
     world: &mut SubWorld,
-    #[resource] key: &Option<VirtualKeyCode>,
-    #[resource] gamepad_key: &mut Option<GamepadKey>,
+    #[state] game_input_state: &mut GameInputState,
+    #[resource] input: &RawInputSignal,
     #[resource] scoring: &mut Scoring,
 ) {
-    if let Some(key) = key.or(gamepad_key.as_mut().and_then(|gkey| gkey.key())) {
+    game_input_state.process(input);
+
+    if let Some(game_input) = game_input_state.get() {
         use super::collision::*;
-        use VirtualKeyCode::*;
-        match key {
-            Left => {
+        use GameInput::*;
+        match game_input {
+            ShiftLeft => {
                 apply_if_collision_free(world, Translation(Point::new(-1, 0)));
             }
-            Right => {
+            ShiftRight => {
                 apply_if_collision_free(world, Translation(Point::new(1, 0)));
             }
-            Up => {
+            RotateCCW => {
                 apply_if_collision_free(world, Rotation::Deg270);
             }
-            Down => {
+            RotateCW => {
                 apply_if_collision_free(world, Rotation::Deg90);
             }
-            Space => {
+            HardDrop => {
                 scoring.hard_drop();
             }
             _ => {}
