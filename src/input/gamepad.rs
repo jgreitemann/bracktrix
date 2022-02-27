@@ -13,8 +13,10 @@ impl GamepadInputSource {
             active_gamepad: None,
         }
     }
+}
 
-    pub fn read(&mut self) -> RawInputSignal {
+impl InputSource for GamepadInputSource {
+    fn read(&mut self) -> RawInputSignal {
         use Button::*;
 
         if let Some(Event { id, .. }) = self.gilrs.next_event() {

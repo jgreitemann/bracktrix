@@ -1,6 +1,8 @@
 mod gamepad;
+mod keyboard;
 
 pub use gamepad::*;
+pub use keyboard::*;
 
 use crate::prelude::*;
 use gilrs::Button;
@@ -32,6 +34,18 @@ impl RawInputSignal {
             time: std::time::Instant::now(),
         }
     }
+
+    pub fn or(self, other: RawInputSignal) -> Self {
+        if let RawInput::None = self.input {
+            other
+        } else {
+            self
+        }
+    }
+}
+
+pub trait InputSource {
+    fn read(&mut self) -> RawInputSignal;
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]

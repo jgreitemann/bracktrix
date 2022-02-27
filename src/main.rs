@@ -37,7 +37,8 @@ use prelude::*;
 
 struct State {
     world: World,
-    input_source: GamepadInputSource,
+    keyboard_input_source: KeyboardInputSource,
+    gamepad_input_source: GamepadInputSource,
     resources: Resources,
     base_systems: Schedule,
     play_systems: Schedule,
@@ -144,7 +145,8 @@ impl State {
 
         Self {
             world,
-            input_source: GamepadInputSource::new(),
+            keyboard_input_source: KeyboardInputSource,
+            gamepad_input_source: GamepadInputSource::new(),
             resources,
             base_systems: build_base_schedule(),
             play_systems: build_play_schedule(),
@@ -162,7 +164,11 @@ impl GameState for State {
         ctx.set_active_console(2);
         ctx.cls_bg((0, 0, 0, 0));
 
-        self.resources.insert(self.input_source.read());
+        self.resources.insert(
+            self.keyboard_input_source
+                .read()
+                .or(self.gamepad_input_source.read()),
+        );
 
         let mode = *self.resources.get::<GameMode>().unwrap();
         self.base_systems
