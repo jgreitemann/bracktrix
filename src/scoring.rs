@@ -68,7 +68,7 @@ impl Scoring {
         if self.hard_dropping {
             1
         } else {
-            12
+            15 - self.level.min(14)
         }
     }
 
