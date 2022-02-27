@@ -9,6 +9,13 @@ pub enum Metric {
     BlocksPlaced,
 }
 
+#[derive(Copy, Clone, PartialEq)]
+enum SoftDropState {
+    Dont,
+    Drop,
+    Blocked,
+}
+
 pub struct Scoring {
     level: usize,
     goal_points: usize,
@@ -18,6 +25,7 @@ pub struct Scoring {
     start_of_game: std::time::Instant,
     blocks_placed: usize,
     hard_dropping: bool,
+    soft_dropping: SoftDropState,
 }
 
 impl Default for Scoring {
@@ -31,6 +39,7 @@ impl Default for Scoring {
             start_of_game: std::time::Instant::now(),
             blocks_placed: 0,
             hard_dropping: false,
+            soft_dropping: SoftDropState::Dont,
         }
     }
 }
@@ -64,9 +73,20 @@ impl Scoring {
         self.hard_dropping = true;
     }
 
+    pub fn soft_drop(&mut self, do_drop: bool) {
+        use SoftDropState::*;
+        self.soft_dropping = match (do_drop, self.soft_dropping) {
+            (true, Blocked) => Blocked,
+            (true, _) => Drop,
+            (false, _) => Dont,
+        }
+    }
+
     pub fn gravity_tick_speed(&self) -> usize {
         if self.hard_dropping {
             1
+        } else if self.soft_dropping == SoftDropState::Drop {
+            2
         } else {
             15 - self.level.min(14)
         }
@@ -107,11 +127,14 @@ impl Scoring {
     pub fn score_block_dropped(&mut self) {
         if self.hard_dropping {
             self.score += 2;
+        } else if self.soft_dropping == SoftDropState::Drop {
+            self.score += 1;
         }
     }
 
     pub fn score_block_placed(&mut self) {
         self.blocks_placed += 1;
         self.hard_dropping = false;
+        self.soft_dropping = SoftDropState::Blocked;
     }
 }

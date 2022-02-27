@@ -31,7 +31,11 @@ pub fn player_input(
             HardDrop => {
                 scoring.hard_drop();
             }
-            _ => {}
+            SoftDrop => {
+                scoring.soft_drop(true);
+            }
         };
+    } else {
+        scoring.soft_drop(false);
     }
 }
