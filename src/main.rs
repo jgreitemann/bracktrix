@@ -2,6 +2,7 @@ mod block;
 mod components;
 mod graphics;
 mod input;
+mod menu;
 mod resources;
 mod scaffold;
 mod scoring;
@@ -33,6 +34,7 @@ mod prelude {
     pub const TEXT_SCALE: usize = 2;
 }
 
+use crate::menu::{MenuBuilder, ScoreboardBuilder};
 use prelude::*;
 
 struct State {
@@ -67,89 +69,28 @@ impl State {
 
         world.extend(scaffold.border_entities());
 
-        let mut scoreboard_rect_iter = scaffold.score_rects();
-        world.push((MenuItem { rank: 0 }, DisplayText("Game Over!".to_string())));
-        world.push((
-            MenuItem { rank: 1 },
-            ScoreboardItem {
-                rect: scoreboard_rect_iter.next().unwrap(),
-            },
-            DisplayText("Level:".to_string()),
-            Score {
-                metric: Metric::Level,
-                style: ScoreStyle::Text,
-            },
-        ));
-        world.push((
-            ScoreboardItem {
-                rect: scoreboard_rect_iter.next().unwrap(),
-            },
-            DisplayText("Level up:".to_string()),
-            Score {
-                metric: Metric::LevelUpFraction,
-                style: ScoreStyle::ProgressBar,
-            },
-        ));
-        world.push((
-            MenuItem { rank: 2 },
-            ScoreboardItem {
-                rect: scoreboard_rect_iter.next().unwrap(),
-            },
-            DisplayText("Score:".to_string()),
-            Score {
-                metric: Metric::Score,
-                style: ScoreStyle::Text,
-            },
-        ));
-        world.push((
-            ScoreboardItem {
-                rect: scoreboard_rect_iter.next().unwrap(),
-            },
-            DisplayText("Lines cleared:".to_string()),
-            Score {
-                metric: Metric::LinesCleared,
-                style: ScoreStyle::Text,
-            },
-        ));
-        world.push((
-            ScoreboardItem {
-                rect: scoreboard_rect_iter.next().unwrap(),
-            },
-            DisplayText("# Bracktrixes:".to_string()),
-            Score {
-                metric: Metric::NumberOfBracktrixes,
-                style: ScoreStyle::Text,
-            },
-        ));
-        world.push((
-            ScoreboardItem {
-                rect: scoreboard_rect_iter.next().unwrap(),
-            },
-            DisplayText("Time elapsed:".to_string()),
-            Score {
-                metric: Metric::TimeElapsed,
-                style: ScoreStyle::Text,
-            },
-        ));
-        world.push((
-            ScoreboardItem {
-                rect: scoreboard_rect_iter.next().unwrap(),
-            },
-            DisplayText("Blocks placed:".to_string()),
-            Score {
-                metric: Metric::BlocksPlaced,
-                style: ScoreStyle::Text,
-            },
-        ));
+        MenuBuilder::new(&world)
+            .add_text("Game Over!")
+            .add_score("Reached level:", Metric::Level)
+            .add_score("Final score:", Metric::Score)
+            .build(&mut world, &mut resources);
 
-        let input_sources: Vec<Box<dyn InputSource>> = vec![
-            Box::new(KeyboardInputSource),
-            Box::new(GamepadInputSource::new()),
-        ];
+        ScoreboardBuilder::new(&world, &mut scaffold.score_rects())
+            .add_score("Level:", Metric::Level)
+            .add_progress_bar("Level up:", Metric::LevelUpFraction)
+            .add_score("Score:", Metric::Score)
+            .add_score("Lines cleared:", Metric::LinesCleared)
+            .add_score("# Bracktrixes:", Metric::NumberOfBracktrixes)
+            .add_score("Time elapsed:", Metric::TimeElapsed)
+            .add_score("Blocks placed:", Metric::BlocksPlaced)
+            .build(&mut world, &mut resources);
 
         Self {
             world,
-            input_sources,
+            input_sources: vec![
+                Box::new(KeyboardInputSource),
+                Box::new(GamepadInputSource::new()),
+            ],
             resources,
             base_systems: build_base_schedule(),
             play_systems: build_play_schedule(),
