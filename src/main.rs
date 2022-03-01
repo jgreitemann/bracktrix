@@ -73,6 +73,8 @@ impl State {
             .add_text("Game Over!")
             .add_score("Reached level:", Metric::Level)
             .add_score("Final score:", Metric::Score)
+            .add_button("Play Again")
+            .add_button("Back to Main Menu")
             .build(&mut world, &mut resources);
 
         ScoreboardBuilder::new(&world, &mut scaffold.score_rects())

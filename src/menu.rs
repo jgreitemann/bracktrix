@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 pub struct MenuBuilder {
     rank: usize,
+    selectable_count: usize,
     cmd: CommandBuffer,
 }
 
@@ -9,6 +10,7 @@ impl MenuBuilder {
     pub fn new(world: &World) -> Self {
         Self {
             rank: 0,
+            selectable_count: 0,
             cmd: CommandBuffer::new(world),
         }
     }
@@ -32,6 +34,14 @@ impl MenuBuilder {
         self
     }
 
+    pub fn add_button<T: ToString>(mut self, label: T) -> Self {
+        let item = self.make_item();
+        self.selectable_count += 1;
+        self.cmd
+            .push((item, DisplayText(label.to_string()), Selectable));
+        self
+    }
+
     fn make_item(&mut self) -> MenuItem {
         let new_rank = self.rank + 1;
         MenuItem {
@@ -40,6 +50,7 @@ impl MenuBuilder {
     }
 
     pub fn build(mut self, world: &mut World, resources: &mut Resources) {
+        self.cmd.push((Focus::new(self.selectable_count),));
         self.cmd.flush(world, resources);
     }
 }

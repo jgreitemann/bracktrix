@@ -20,3 +20,17 @@ pub struct Score {
     pub metric: Metric,
     pub style: ScoreStyle,
 }
+
+pub struct Selectable;
+
+#[derive(Copy, Clone)]
+pub struct Focus {
+    pub current: usize,
+    count: usize,
+}
+
+impl Focus {
+    pub fn new(count: usize) -> Self {
+        Self { current: 0, count }
+    }
+}

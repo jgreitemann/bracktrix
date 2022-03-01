@@ -9,23 +9,32 @@ const V_PADDING: usize = 2;
 #[read_component(MenuItem)]
 #[read_component(DisplayText)]
 #[read_component(Score)]
+#[read_component(Focus)]
+#[read_component(Selectable)]
 pub fn menu_render(world: &SubWorld, #[resource] scoring: &Scoring) {
     let mut draw_batch = DrawBatch::new();
     draw_batch.target(2);
     draw_batch.cls_color((0, 0, 0, 200));
 
-    let entries = <(&MenuItem, &DisplayText, Option<&Score>)>::query()
+    let focus = <&Focus>::query().iter(world).cloned().next();
+
+    let entries = <(&MenuItem, &DisplayText, Option<&Score>, Option<&Selectable>)>::query()
         .iter(world)
         .sorted_by_key(|(MenuItem { rank }, ..)| rank)
-        .map(|(_, DisplayText(text), stat)| match stat {
-            Some(&Score { metric, .. }) => format!("{} {}", text, scoring.get_text(metric)),
-            None => text.clone(),
+        .map(|(_, DisplayText(text), stat, selectable)| {
+            (
+                match stat {
+                    Some(&Score { metric, .. }) => format!("{} {}", text, scoring.get_text(metric)),
+                    None => text.clone(),
+                },
+                selectable.is_some(),
+            )
         })
         .collect_vec();
 
-    if let Some(max_len) = entries.iter().map(|text| text.len()).max() {
-        let menu_width = (max_len / 2 + H_PADDING) * 2;
-        let menu_height = SPACING * (entries.len() - 1) + 2 * V_PADDING;
+    if let Some(max_len) = entries.iter().map(|(text, _)| text.len()).max() {
+        let menu_width = (max_len / 2 + H_PADDING + 1) * 2;
+        let menu_height = SPACING * entries.len() + 2 * V_PADDING - 1;
 
         let menu_rect = Rect::with_size(
             SCREEN_WIDTH - menu_width / 2,
@@ -36,9 +45,37 @@ pub fn menu_render(world: &SubWorld, #[resource] scoring: &Scoring) {
 
         draw_batch.draw_box(menu_rect, ColorPair::new(WHITE, BLACK));
 
-        entries.iter().enumerate().for_each(|(i, text)| {
-            draw_batch.print_centered(menu_rect.y1 + (V_PADDING + SPACING * i) as i32, text);
+        let menu_rects = (0..entries.len()).map(|i| {
+            Rect::with_size(
+                menu_rect.x1 as usize + H_PADDING,
+                menu_rect.y1 as usize + (V_PADDING + SPACING * i),
+                menu_width - 2 * H_PADDING,
+                SPACING - 1,
+            )
         });
+
+        if let Some(Focus {
+            current: focus_index,
+            ..
+        }) = focus
+        {
+            if let Some(focus_rect) = entries
+                .iter()
+                .zip(menu_rects.clone())
+                .filter_map(|((_, selectable), rect)| if *selectable { Some(rect) } else { None })
+                .nth(focus_index)
+            {
+                draw_batch.draw_box(focus_rect, ColorPair::new(WHITE, BLACK));
+            }
+        }
+
+        entries
+            .iter()
+            .zip(menu_rects)
+            .for_each(|((text, _), rect)| {
+                let print_y = rect.center().y;
+                draw_batch.print_centered(print_y, text);
+            });
     }
 
     draw_batch.submit(5000).expect("Batch error");
