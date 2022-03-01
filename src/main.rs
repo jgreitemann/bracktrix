@@ -37,8 +37,7 @@ use prelude::*;
 
 struct State {
     world: World,
-    keyboard_input_source: KeyboardInputSource,
-    gamepad_input_source: GamepadInputSource,
+    input_sources: Vec<Box<dyn InputSource>>,
     resources: Resources,
     base_systems: Schedule,
     play_systems: Schedule,
@@ -143,10 +142,14 @@ impl State {
             },
         ));
 
+        let input_sources: Vec<Box<dyn InputSource>> = vec![
+            Box::new(KeyboardInputSource),
+            Box::new(GamepadInputSource::new()),
+        ];
+
         Self {
             world,
-            keyboard_input_source: KeyboardInputSource,
-            gamepad_input_source: GamepadInputSource::new(),
+            input_sources,
             resources,
             base_systems: build_base_schedule(),
             play_systems: build_play_schedule(),
@@ -164,11 +167,13 @@ impl GameState for State {
         ctx.set_active_console(2);
         ctx.cls_bg((0, 0, 0, 0));
 
-        self.resources.insert(
-            self.keyboard_input_source
-                .read()
-                .or(self.gamepad_input_source.read()),
-        );
+        let input = self
+            .input_sources
+            .iter_mut()
+            .fold(RawInputSignal::default(), |prev, source| {
+                prev.or(source.read())
+            });
+        self.resources.insert(input);
 
         let mode = *self.resources.get::<GameMode>().unwrap();
         self.base_systems

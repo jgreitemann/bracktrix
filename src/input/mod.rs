@@ -9,15 +9,24 @@ use gilrs::Button;
 
 #[derive(Copy, Clone, Debug)]
 pub enum RawInput {
+    None,
     KeyboardInput(VirtualKeyCode),
     GamepadInput(Button),
-    None,
 }
 
 #[derive(Debug)]
 pub struct RawInputSignal {
     input: RawInput,
     time: std::time::Instant,
+}
+
+impl Default for RawInputSignal {
+    fn default() -> Self {
+        Self {
+            input: RawInput::None,
+            time: std::time::Instant::now(),
+        }
+    }
 }
 
 impl RawInputSignal {

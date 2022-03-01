@@ -9,7 +9,4 @@ edition = "2021"
 bracket-lib = "0.8.1"
 legion = "0.4.0"
 itertools = "0.10.3"
-gilrs = {version = "0.8.2", optional = true}
-
-[features]
-gamepad = ["gilrs"]
+gilrs = "0.8.2"
