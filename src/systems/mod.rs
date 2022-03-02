@@ -1,11 +1,12 @@
 mod block_spawning;
 mod collision;
+mod game_input;
 mod gravity;
 mod line_deletion;
 mod line_detection;
+mod menu_input;
 mod menu_renderer;
 mod pixel_renderer;
-mod player_input;
 mod scoreboard_renderer;
 
 use crate::prelude::*;
@@ -19,7 +20,7 @@ pub fn build_base_schedule() -> Schedule {
 
 pub fn build_play_schedule() -> Schedule {
     Schedule::builder()
-        .add_system(player_input::player_input_system(GameInputState::new()))
+        .add_system(game_input::game_input_system(GameInputState::new()))
         .add_system(gravity::gravity_system(0))
         .add_system(block_spawning::block_spawning_system())
         .add_system(line_detection::line_detection_system())
@@ -29,6 +30,7 @@ pub fn build_play_schedule() -> Schedule {
 
 pub fn build_menu_schedule() -> Schedule {
     Schedule::builder()
+        .add_system(menu_input::menu_input_system(MenuInputState::new()))
         .add_system(menu_renderer::menu_render_system())
         .build()
 }

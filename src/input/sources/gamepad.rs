@@ -1,4 +1,4 @@
-use super::*;
+use crate::input::*;
 use gilrs::*;
 
 pub struct GamepadInputSource {

@@ -74,6 +74,7 @@ impl State {
             .add_score("Reached level:", Metric::Level)
             .add_score("Final score:", Metric::Score)
             .add_button("Play Again")
+            .add_button("Show Leaderboard")
             .add_button("Back to Main Menu")
             .build(&mut world, &mut resources);
 

@@ -4,7 +4,7 @@ use crate::prelude::*;
 #[write_component(Position)]
 #[write_component(Pivot)]
 #[read_component(Active)]
-pub fn player_input(
+pub fn game_input(
     world: &mut SubWorld,
     #[state] game_input_state: &mut GameInputState,
     #[resource] input: &RawInputSignal,
