@@ -74,7 +74,7 @@ impl State {
             .add_text("~~~~~~~~")
             .add_button("Play Game", Action::NotImplemented)
             .add_button("Show Leaderboard", Action::NotImplemented)
-            .add_button("Quit", Action::NotImplemented)
+            .add_button("Quit", Action::Quit)
             .build(&mut world, &mut resources);
 
         MenuBuilder::new(Menu::GameOver, &world)
@@ -136,6 +136,10 @@ impl GameState for State {
             GameMode::Menu(menu) => {
                 self.resources.insert(menu);
                 &mut self.menu_systems
+            }
+            GameMode::Quitting => {
+                ctx.quit();
+                return;
             }
         }
         .execute(&mut self.world, &mut self.resources);

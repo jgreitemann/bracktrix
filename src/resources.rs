@@ -10,6 +10,7 @@ pub enum Menu {
 pub enum GameMode {
     Play,
     Menu(Menu),
+    Quitting,
 }
 
 pub struct Screen(pub Rect);

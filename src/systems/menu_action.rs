@@ -8,6 +8,9 @@ pub fn menu_action(entity: &Entity, action: &Action, cmd: &mut CommandBuffer) {
         Action::BackToMainMenu => {
             *resources.get_mut::<GameMode>().unwrap() = GameMode::Menu(Menu::Main);
         }
+        Action::Quit => {
+            *resources.get_mut::<GameMode>().unwrap() = GameMode::Quitting;
+        }
     });
 
     cmd.remove(*entity);

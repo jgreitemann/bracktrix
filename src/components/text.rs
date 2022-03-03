@@ -28,6 +28,7 @@ pub struct Focus;
 pub enum Action {
     NotImplemented,
     BackToMainMenu,
+    Quit,
 }
 
 pub struct Actionable(pub Action);
