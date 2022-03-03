@@ -9,6 +9,7 @@ pub fn menu_input(
     world: &mut SubWorld,
     cmd: &mut CommandBuffer,
     #[state] menu_input_state: &mut MenuInputState,
+    #[resource] &active_menu: &Menu,
     #[resource] input: &RawInputSignal,
 ) {
     menu_input_state.process(input);
@@ -16,7 +17,8 @@ pub fn menu_input(
     if let Some(menu_input) = menu_input_state.get() {
         let entries: Vec<_> = <(Entity, &MenuItem, &Actionable, Option<&Focus>)>::query()
             .iter(world)
-            .sorted_by_key(|(_, &MenuItem { rank }, ..)| rank)
+            .filter(|(_, &MenuItem { menu, .. }, ..)| menu == active_menu)
+            .sorted_by_key(|(_, &MenuItem { rank, .. }, ..)| rank)
             .collect();
 
         if let Some((focus_index, &(focus_entity, _, Actionable(focus_action), _))) = entries

@@ -69,14 +69,22 @@ impl State {
 
         world.extend(scaffold.border_entities());
 
-        MenuBuilder::new(&world)
+        MenuBuilder::new(Menu::Main, &world)
+            .add_text("Welcome to Bracktrix")
+            .add_text("~~~~~~~~")
+            .add_button("Play Game", Action::NotImplemented)
+            .add_button("Show Leaderboard", Action::NotImplemented)
+            .add_button("Quit", Action::NotImplemented)
+            .build(&mut world, &mut resources);
+
+        MenuBuilder::new(Menu::GameOver, &world)
             .add_text("Game Over!")
             .add_score("Reached level:", Metric::Level)
             .add_score("Final score:", Metric::Score)
             .add_text("~~~~~~~~")
-            .add_button("Play Again")
-            .add_button("Show Leaderboard")
-            .add_button("Back to Main Menu")
+            .add_button("Play Again", Action::NotImplemented)
+            .add_button("Show Leaderboard", Action::NotImplemented)
+            .add_button("Back to Main Menu", Action::BackToMainMenu)
             .build(&mut world, &mut resources);
 
         ScoreboardBuilder::new(&world, &mut scaffold.score_rects())
@@ -125,7 +133,10 @@ impl GameState for State {
             .execute(&mut self.world, &mut self.resources);
         match mode {
             GameMode::Play => &mut self.play_systems,
-            GameMode::Menu => &mut self.menu_systems,
+            GameMode::Menu(menu) => {
+                self.resources.insert(menu);
+                &mut self.menu_systems
+            }
         }
         .execute(&mut self.world, &mut self.resources);
 

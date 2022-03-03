@@ -1,14 +1,16 @@
 use crate::prelude::*;
 
 pub struct MenuBuilder {
+    menu: Menu,
     rank: usize,
     focus: Option<Focus>,
     cmd: CommandBuffer,
 }
 
 impl MenuBuilder {
-    pub fn new(world: &World) -> Self {
+    pub fn new(menu: Menu, world: &World) -> Self {
         Self {
+            menu,
             rank: 0,
             focus: Some(Focus),
             cmd: CommandBuffer::new(world),
@@ -34,13 +36,11 @@ impl MenuBuilder {
         self
     }
 
-    pub fn add_button<T: ToString>(mut self, label: T) -> Self {
+    pub fn add_button<T: ToString>(mut self, label: T, action: Action) -> Self {
         let item = self.make_item();
-        let button = self.cmd.push((
-            item,
-            DisplayText(label.to_string()),
-            Actionable(Action::Print("Hello world".to_string())),
-        ));
+        let button = self
+            .cmd
+            .push((item, DisplayText(label.to_string()), Actionable(action)));
         if let Some(focus) = std::mem::replace(&mut self.focus, None) {
             self.cmd.add_component(button, focus);
         }
@@ -50,6 +50,7 @@ impl MenuBuilder {
     fn make_item(&mut self) -> MenuItem {
         let new_rank = self.rank + 1;
         MenuItem {
+            menu: self.menu,
             rank: std::mem::replace(&mut self.rank, new_rank),
         }
     }

@@ -26,7 +26,7 @@ pub fn block_spawning(
         cmd.exec_mut(move |world, resources| {
             let (mut subworld, _) = world.split::<(&mut Position, &mut Pivot, &Active)>();
             if !super::collision::apply_if_collision_free(&mut subworld, translation) {
-                *resources.get_mut::<GameMode>().unwrap() = GameMode::Menu;
+                *resources.get_mut::<GameMode>().unwrap() = GameMode::Menu(Menu::GameOver);
             }
         });
     }

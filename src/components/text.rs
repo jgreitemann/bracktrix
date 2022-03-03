@@ -1,6 +1,7 @@
 use crate::prelude::*;
 
 pub struct MenuItem {
+    pub menu: Menu,
     pub rank: usize,
 }
 
@@ -25,7 +26,8 @@ pub struct Focus;
 
 #[derive(Clone)]
 pub enum Action {
-    Print(String),
+    NotImplemented,
+    BackToMainMenu,
 }
 
 pub struct Actionable(pub Action);

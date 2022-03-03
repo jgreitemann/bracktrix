@@ -10,14 +10,19 @@ const V_PADDING: usize = 2;
 #[read_component(DisplayText)]
 #[read_component(Score)]
 #[read_component(Focus)]
-pub fn menu_render(world: &SubWorld, #[resource] scoring: &Scoring) {
+pub fn menu_render(
+    world: &SubWorld,
+    #[resource] &active_menu: &Menu,
+    #[resource] scoring: &Scoring,
+) {
     let mut draw_batch = DrawBatch::new();
     draw_batch.target(2);
     draw_batch.cls_color((0, 0, 0, 200));
 
     let entries = <(&MenuItem, &DisplayText, Option<&Score>, Option<&Focus>)>::query()
         .iter(world)
-        .sorted_by_key(|(MenuItem { rank }, ..)| rank)
+        .filter(|(&MenuItem { menu, .. }, ..)| menu == active_menu)
+        .sorted_by_key(|(MenuItem { rank, .. }, ..)| rank)
         .map(|(_, DisplayText(text), stat, focus)| {
             (
                 match stat {
