@@ -21,24 +21,11 @@ pub struct Score {
     pub style: ScoreStyle,
 }
 
-pub struct Selectable;
+pub struct Focus;
 
-#[derive(Copy, Clone)]
-pub struct Focus {
-    pub current: usize,
-    count: usize,
+#[derive(Clone)]
+pub enum Action {
+    Print(String),
 }
 
-impl Focus {
-    pub fn new(count: usize) -> Self {
-        Self { current: 0, count }
-    }
-
-    pub fn up(&mut self) {
-        self.current = (self.current + self.count - 1) % self.count;
-    }
-
-    pub fn down(&mut self) {
-        self.current = (self.current + 1) % self.count;
-    }
-}
+pub struct Actionable(pub Action);

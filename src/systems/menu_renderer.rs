@@ -10,24 +10,21 @@ const V_PADDING: usize = 2;
 #[read_component(DisplayText)]
 #[read_component(Score)]
 #[read_component(Focus)]
-#[read_component(Selectable)]
 pub fn menu_render(world: &SubWorld, #[resource] scoring: &Scoring) {
     let mut draw_batch = DrawBatch::new();
     draw_batch.target(2);
     draw_batch.cls_color((0, 0, 0, 200));
 
-    let focus = <&Focus>::query().iter(world).cloned().next();
-
-    let entries = <(&MenuItem, &DisplayText, Option<&Score>, Option<&Selectable>)>::query()
+    let entries = <(&MenuItem, &DisplayText, Option<&Score>, Option<&Focus>)>::query()
         .iter(world)
         .sorted_by_key(|(MenuItem { rank }, ..)| rank)
-        .map(|(_, DisplayText(text), stat, selectable)| {
+        .map(|(_, DisplayText(text), stat, focus)| {
             (
                 match stat {
                     Some(&Score { metric, .. }) => format!("{} {}", text, scoring.get_text(metric)),
                     None => text.clone(),
                 },
-                selectable.is_some(),
+                focus.is_some(),
             )
         })
         .collect_vec();
@@ -54,25 +51,13 @@ pub fn menu_render(world: &SubWorld, #[resource] scoring: &Scoring) {
             )
         });
 
-        if let Some(Focus {
-            current: focus_index,
-            ..
-        }) = focus
-        {
-            if let Some(focus_rect) = entries
-                .iter()
-                .zip(menu_rects.clone())
-                .filter_map(|((_, selectable), rect)| if *selectable { Some(rect) } else { None })
-                .nth(focus_index)
-            {
-                draw_batch.draw_box(focus_rect, ColorPair::new(WHITE, BLACK));
-            }
-        }
-
         entries
             .iter()
             .zip(menu_rects)
-            .for_each(|((text, _), rect)| {
+            .for_each(|((text, has_focus), rect)| {
+                if *has_focus {
+                    draw_batch.draw_box(rect, ColorPair::new(WHITE, BLACK));
+                }
                 let print_y = rect.center().y;
                 draw_batch.print_centered(print_y, text);
             });

@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 pub struct MenuBuilder {
     rank: usize,
-    selectable_count: usize,
+    focus: Option<Focus>,
     cmd: CommandBuffer,
 }
 
@@ -10,7 +10,7 @@ impl MenuBuilder {
     pub fn new(world: &World) -> Self {
         Self {
             rank: 0,
-            selectable_count: 0,
+            focus: Some(Focus),
             cmd: CommandBuffer::new(world),
         }
     }
@@ -36,9 +36,14 @@ impl MenuBuilder {
 
     pub fn add_button<T: ToString>(mut self, label: T) -> Self {
         let item = self.make_item();
-        self.selectable_count += 1;
-        self.cmd
-            .push((item, DisplayText(label.to_string()), Selectable));
+        let button = self.cmd.push((
+            item,
+            DisplayText(label.to_string()),
+            Actionable(Action::Print("Hello world".to_string())),
+        ));
+        if let Some(focus) = std::mem::replace(&mut self.focus, None) {
+            self.cmd.add_component(button, focus);
+        }
         self
     }
 
@@ -50,7 +55,6 @@ impl MenuBuilder {
     }
 
     pub fn build(mut self, world: &mut World, resources: &mut Resources) {
-        self.cmd.push((Focus::new(self.selectable_count),));
         self.cmd.flush(world, resources);
     }
 }

@@ -4,6 +4,7 @@ mod game_input;
 mod gravity;
 mod line_deletion;
 mod line_detection;
+mod menu_action;
 mod menu_input;
 mod menu_renderer;
 mod pixel_renderer;
@@ -31,6 +32,8 @@ pub fn build_play_schedule() -> Schedule {
 pub fn build_menu_schedule() -> Schedule {
     Schedule::builder()
         .add_system(menu_input::menu_input_system(MenuInputState::new()))
+        .flush()
         .add_system(menu_renderer::menu_render_system())
+        .add_system(menu_action::menu_action_system())
         .build()
 }

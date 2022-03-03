@@ -1,22 +1,45 @@
 use crate::prelude::*;
+use itertools::Itertools;
 
 #[system]
-#[write_component(Focus)]
-#[read_component(Active)]
+#[read_component(Actionable)]
+#[read_component(MenuItem)]
+#[read_component(Focus)]
 pub fn menu_input(
     world: &mut SubWorld,
+    cmd: &mut CommandBuffer,
     #[state] menu_input_state: &mut MenuInputState,
     #[resource] input: &RawInputSignal,
 ) {
     menu_input_state.process(input);
 
     if let Some(menu_input) = menu_input_state.get() {
-        if let Some(focus) = <&mut Focus>::query().iter_mut(world).next() {
+        let entries: Vec<_> = <(Entity, &MenuItem, &Actionable, Option<&Focus>)>::query()
+            .iter(world)
+            .sorted_by_key(|(_, &MenuItem { rank }, ..)| rank)
+            .collect();
+
+        if let Some((focus_index, &(focus_entity, _, Actionable(focus_action), _))) = entries
+            .iter()
+            .enumerate()
+            .find(|(_, (_, _, _, f))| f.is_some())
+        {
             use MenuInput::*;
             match menu_input {
-                NavigateUp => focus.up(),
-                NavigateDown => focus.down(),
-                Choose => todo!(),
+                NavigateUp => {
+                    cmd.remove_component::<Focus>(*focus_entity);
+                    cmd.add_component(
+                        *entries[(focus_index + entries.len() - 1) % entries.len()].0,
+                        Focus,
+                    );
+                }
+                NavigateDown => {
+                    cmd.remove_component::<Focus>(*focus_entity);
+                    cmd.add_component(*entries[(focus_index + 1) % entries.len()].0, Focus);
+                }
+                Choose => {
+                    cmd.push((focus_action.clone(),));
+                }
             }
         }
     }
