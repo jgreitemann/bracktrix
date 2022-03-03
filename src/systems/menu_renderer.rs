@@ -32,8 +32,8 @@ pub fn menu_render(world: &SubWorld, #[resource] scoring: &Scoring) {
         })
         .collect_vec();
 
-    if let Some(max_len) = entries.iter().map(|(text, _)| text.len()).max() {
-        let menu_width = (max_len / 2 + H_PADDING + 1) * 2;
+    if let Some(max_len) = entries.iter().map(|(text, _)| text.chars().count()).max() {
+        let menu_width = (max_len / 2 + H_PADDING + 3) * 2;
         let menu_height = SPACING * entries.len() + 2 * V_PADDING - 1;
 
         let menu_rect = Rect::with_size(
@@ -43,7 +43,7 @@ pub fn menu_render(world: &SubWorld, #[resource] scoring: &Scoring) {
             menu_height,
         );
 
-        draw_batch.draw_box(menu_rect, ColorPair::new(WHITE, BLACK));
+        draw_batch.draw_double_box(menu_rect, ColorPair::new(WHITE, BLACK));
 
         let menu_rects = (0..entries.len()).map(|i| {
             Rect::with_size(

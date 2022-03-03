@@ -73,6 +73,7 @@ impl State {
             .add_text("Game Over!")
             .add_score("Reached level:", Metric::Level)
             .add_score("Final score:", Metric::Score)
+            .add_text("~~~~~~~~")
             .add_button("Play Again")
             .add_button("Show Leaderboard")
             .add_button("Back to Main Menu")
