@@ -95,7 +95,7 @@ impl Block {
         }
     }
 
-    pub fn components<Tag>(&self, spawn: &Point) -> [(Tag, Position, Pivot, PixelRender); 4]
+    pub fn components<Tag>(&self, spawn: &Point) -> [(Game, Tag, Position, Pivot, PixelRender); 4]
     where
         Tag: Copy + Default,
     {
@@ -105,8 +105,15 @@ impl Block {
             colors: self.colors(),
             glyph: to_cp437('█'),
         };
-        self.points()
-            .map(|pt| (tag, Position(pt + *spawn), Pivot(pt * 2 - offset), render))
+        self.points().map(|pt| {
+            (
+                Game,
+                tag,
+                Position(pt + *spawn),
+                Pivot(pt * 2 - offset),
+                render,
+            )
+        })
     }
 }
 

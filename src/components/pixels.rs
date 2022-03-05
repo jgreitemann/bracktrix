@@ -1,6 +1,9 @@
 use crate::prelude::*;
 
 #[derive(Copy, Clone, Default)]
+pub struct Game;
+
+#[derive(Copy, Clone, Default)]
 pub struct Active;
 
 #[derive(Copy, Clone, Default)]

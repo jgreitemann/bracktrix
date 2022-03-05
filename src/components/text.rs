@@ -27,6 +27,7 @@ pub struct Focus;
 #[derive(Clone)]
 pub enum Action {
     NotImplemented,
+    StartGame,
     BackToMainMenu,
     Quit,
 }

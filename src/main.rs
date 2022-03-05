@@ -51,7 +51,7 @@ impl State {
         let mut world = World::default();
         let mut resources = Resources::default();
 
-        resources.insert(GameMode::Play);
+        resources.insert(GameMode::Menu(Menu::Main));
         resources.insert(RandomNumberGenerator::new());
         resources.insert(Scoring::default());
 
@@ -72,7 +72,7 @@ impl State {
         MenuBuilder::new(Menu::Main, &world)
             .add_text("Welcome to Bracktrix")
             .add_text("~~~~~~~~")
-            .add_button("Play Game", Action::NotImplemented)
+            .add_button("Play Game", Action::StartGame)
             .add_button("Show Leaderboard", Action::NotImplemented)
             .add_button("Quit", Action::Quit)
             .build(&mut world, &mut resources);
@@ -82,7 +82,7 @@ impl State {
             .add_score("Reached level:", Metric::Level)
             .add_score("Final score:", Metric::Score)
             .add_text("~~~~~~~~")
-            .add_button("Play Again", Action::NotImplemented)
+            .add_button("Play Again", Action::StartGame)
             .add_button("Show Leaderboard", Action::NotImplemented)
             .add_button("Back to Main Menu", Action::BackToMainMenu)
             .build(&mut world, &mut resources);
