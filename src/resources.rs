@@ -5,6 +5,7 @@ pub enum Menu {
     Main,
     GameOver,
     Statistics,
+    Pause,
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]

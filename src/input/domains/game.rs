@@ -9,6 +9,7 @@ pub enum GameInput {
     RotateCCW,
     SoftDrop,
     HardDrop,
+    PauseGame,
 }
 
 impl DomainInput for GameInput {
@@ -22,6 +23,7 @@ impl DomainInput for GameInput {
                 VirtualKeyCode::RControl => Some(RotateCCW),
                 VirtualKeyCode::Down => Some(SoftDrop),
                 VirtualKeyCode::Space | VirtualKeyCode::Return => Some(HardDrop),
+                VirtualKeyCode::Escape => Some(PauseGame),
                 _ => None,
             },
             RawInput::GamepadInput(button) => match button {
@@ -31,6 +33,7 @@ impl DomainInput for GameInput {
                 Button::South => Some(RotateCCW),
                 Button::DPadDown => Some(SoftDrop),
                 Button::DPadUp => Some(HardDrop),
+                Button::Start => Some(PauseGame),
                 _ => None,
             },
             RawInput::None => None,
@@ -43,7 +46,7 @@ impl DomainInput for GameInput {
         match self {
             ShiftLeft | ShiftRight => [150, 35].map(|ms| Duration::from_millis(ms)),
             SoftDrop => [Duration::ZERO; 2],
-            HardDrop | RotateCW | RotateCCW => [Duration::MAX; 2],
+            HardDrop | RotateCW | RotateCCW | PauseGame => [Duration::MAX; 2],
         }
     }
 }

@@ -14,6 +14,7 @@ impl InputSource for KeyboardInputSource {
             VirtualKeyCode::RControl,
             VirtualKeyCode::Space,
             VirtualKeyCode::Return,
+            VirtualKeyCode::Escape,
         ]
         .into_iter()
         .find(|k| input.is_key_pressed(*k));

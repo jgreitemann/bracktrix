@@ -28,6 +28,7 @@ pub struct Focus;
 pub enum Action {
     NotImplemented,
     StartGame,
+    ResumeGame,
     GoToMenu(Menu),
     Quit,
 }

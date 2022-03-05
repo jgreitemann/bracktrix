@@ -100,6 +100,14 @@ impl State {
             .add_button("Back", Action::GoToMenu(Menu::GameOver))
             .build(&mut world, &mut resources);
 
+        MenuBuilder::new(Menu::Pause, &world)
+            .add_text("Game Paused")
+            .add_text("~~~~~~~~")
+            .add_button("Resume Game", Action::ResumeGame)
+            .add_button("Restart Game", Action::StartGame)
+            .add_button("Back to Main Menu", Action::GoToMenu(Menu::Main))
+            .build(&mut world, &mut resources);
+
         ScoreboardBuilder::new(&world, &mut scaffold.score_rects())
             .add_score("Level:", Metric::Level)
             .add_progress_bar("Level up:", Metric::LevelUpFraction)

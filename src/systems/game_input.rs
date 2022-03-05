@@ -6,6 +6,7 @@ use crate::prelude::*;
 #[read_component(Active)]
 pub fn game_input(
     world: &mut SubWorld,
+    cmd: &mut CommandBuffer,
     #[state] game_input_state: &mut GameInputState,
     #[resource] input: &RawInputSignal,
     #[resource] scoring: &mut Scoring,
@@ -33,6 +34,9 @@ pub fn game_input(
             }
             SoftDrop => {
                 scoring.soft_drop(true);
+            }
+            PauseGame => {
+                cmd.push((Action::GoToMenu(Menu::Pause),));
             }
         };
     } else {

@@ -30,6 +30,8 @@ impl InputSource for GamepadInputSource {
                 Some(South)
             } else if gamepad.is_pressed(East) {
                 Some(East)
+            } else if gamepad.is_pressed(Start) {
+                Some(Start)
             } else {
                 gamepad
                     .button_data(DPadRight)
