@@ -84,7 +84,20 @@ impl State {
             .add_text("~~~~~~~~")
             .add_button("Play Again", Action::StartGame)
             .add_button("Show Leaderboard", Action::NotImplemented)
-            .add_button("Back to Main Menu", Action::BackToMainMenu)
+            .add_button("More Statistics", Action::GoToMenu(Menu::Statistics))
+            .add_button("Back to Main Menu", Action::GoToMenu(Menu::Main))
+            .build(&mut world, &mut resources);
+
+        MenuBuilder::new(Menu::Statistics, &world)
+            .add_text("Game Statistics")
+            .add_text("~~~~~~~~~~~~~~~~~")
+            .add_score("Reached level:", Metric::Level)
+            .add_score("Final score:", Metric::Score)
+            .add_score("Lines cleared:", Metric::LinesCleared)
+            .add_score("# Bracktrixes:", Metric::NumberOfBracktrixes)
+            .add_score("Time elapsed:", Metric::TimeElapsed)
+            .add_score("Blocks placed:", Metric::BlocksPlaced)
+            .add_button("Back", Action::GoToMenu(Menu::GameOver))
             .build(&mut world, &mut resources);
 
         ScoreboardBuilder::new(&world, &mut scaffold.score_rects())

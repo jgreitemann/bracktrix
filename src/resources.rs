@@ -4,6 +4,7 @@ use crate::prelude::*;
 pub enum Menu {
     Main,
     GameOver,
+    Statistics,
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]

@@ -17,7 +17,7 @@ pub fn menu_action(entity: &Entity, action: &Action, cmd: &mut CommandBuffer) {
             resources.insert(Scoring::default());
             resources.insert(GameMode::Play);
         }
-        Action::BackToMainMenu => resources.insert(GameMode::Menu(Menu::Main)),
+        Action::GoToMenu(menu) => resources.insert(GameMode::Menu(menu)),
         Action::Quit => resources.insert(GameMode::Quitting),
     });
 
