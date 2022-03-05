@@ -122,16 +122,16 @@ mod test {
     use super::*;
     use crate::test_utils::*;
 
-    struct Rotating([(Preview, Position, Pivot, PixelRender); 4]);
+    struct Rotating([(Game, Preview, Position, Pivot, PixelRender); 4]);
 
     impl Iterator for Rotating {
         type Item = [Point; 4];
 
         fn next(&mut self) -> Option<[Point; 4]> {
-            let copy = self.0.map(|(_, Position(pos), _, _)| pos);
+            let copy = self.0.map(|(_, _, Position(pos), _, _)| pos);
             self.0
                 .iter_mut()
-                .for_each(|(_, pos, pivot, _)| Rotation::Deg90.apply_to(pos, pivot));
+                .for_each(|(_, _, pos, pivot, _)| Rotation::Deg90.apply_to(pos, pivot));
             Some(copy)
         }
     }
