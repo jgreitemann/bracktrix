@@ -17,7 +17,7 @@ impl DomainInput for MenuInput {
             RawInput::KeyboardInput(key) => match key {
                 VirtualKeyCode::Up => Some(NavigateUp),
                 VirtualKeyCode::Down => Some(NavigateDown),
-                VirtualKeyCode::Return | VirtualKeyCode::Space => Some(Choose),
+                VirtualKeyCode::Return => Some(Choose),
                 _ => None,
             },
             RawInput::GamepadInput(button) => match button {

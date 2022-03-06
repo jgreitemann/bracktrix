@@ -22,7 +22,7 @@ impl DomainInput for GameInput {
                 VirtualKeyCode::Up => Some(RotateCW),
                 VirtualKeyCode::RControl => Some(RotateCCW),
                 VirtualKeyCode::Down => Some(SoftDrop),
-                VirtualKeyCode::Space | VirtualKeyCode::Return => Some(HardDrop),
+                VirtualKeyCode::Space => Some(HardDrop),
                 VirtualKeyCode::Escape => Some(PauseGame),
                 _ => None,
             },
