@@ -177,8 +177,9 @@ fn main() -> BError {
             (SCREEN_WIDTH * SCALE) as i32,
             (SCREEN_HEIGHT * SCALE) as i32,
         )
+        .with_font("bracktrix64x64.png", 64, 64)
         .with_font("terminal8x8.png", 8, 8)
-        .with_simple_console(SCREEN_WIDTH, SCREEN_HEIGHT, "terminal8x8.png")
+        .with_simple_console(SCREEN_WIDTH, SCREEN_HEIGHT, "bracktrix64x64.png")
         .with_simple_console_no_bg(
             TEXT_SCALE * SCREEN_WIDTH,
             TEXT_SCALE * SCREEN_HEIGHT,

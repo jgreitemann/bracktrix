@@ -28,13 +28,13 @@ impl Block {
     fn colors(&self) -> ColorPair {
         ColorPair::new(
             match self {
-                Block::L => ORANGE3,
-                Block::J => BLUE3,
-                Block::O => YELLOW3,
-                Block::S => GREEN3,
-                Block::Z => RED3,
-                Block::T => PURPLE3,
-                Block::I => TURQUOISE3,
+                Block::L => ORANGE,
+                Block::J => (50, 77, 255),
+                Block::O => YELLOW,
+                Block::S => GREEN,
+                Block::Z => RED,
+                Block::T => PURPLE,
+                Block::I => TURQUOISE,
             },
             BLACK,
         )

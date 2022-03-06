@@ -17,7 +17,7 @@ pub fn menu_render(
 ) {
     let mut draw_batch = DrawBatch::new();
     draw_batch.target(2);
-    draw_batch.cls_color((0, 0, 0, 200));
+    draw_batch.cls_color((0, 0, 0, 150));
 
     let entries = <(&MenuItem, &DisplayText, Option<&Score>, Option<&Focus>)>::query()
         .iter(world)
