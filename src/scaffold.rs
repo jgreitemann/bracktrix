@@ -35,7 +35,7 @@ impl Scaffold {
                 (
                     Position(p),
                     PixelRender {
-                        colors: ColorPair::new(LIGHT_SLATE, BLACK),
+                        colors: ColorPair::new((159, 166, 183), BLACK),
                         glyph: to_cp437(border_glyph(&p, &unique_border_points)),
                     },
                 )
